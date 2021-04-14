@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html lang="lt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="#{categories}"></title>
+    <th:block th:insert="fragments/head :: head"></th:block>
+    <link th:rel="stylesheet" th:href="@{/assets/styles/productList.css}"/>
+</head>
+<body>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<h2 class="text-center mt-5" th:text="#{categories}"></h2>
+<div class="container d-flex justify-content-center mt-50 mb-50">
+    <div class="row">
+        <div class="col-md-4 mt-2" th:each="category : ${categories}">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-img-actions">
+                        <a th:href="@{/category/{id}(id=${category.getId()})}">
+                            <img th:src="'/assets/images/' + ${category.getImageLink()}" class="card-img img-fluid"
+                                 alt="">
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body bg-light text-center">
+                    <div class="mb-2">
+                        <h6 class="font-weight-semibold mb-2">
+                            <a th:href="@{/category/{id}(id=${category.getId()})}" class="text-default mb-2" data-abc="true"
+                               th:text="#{'category.' + ${category.getId()}}"></a>
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

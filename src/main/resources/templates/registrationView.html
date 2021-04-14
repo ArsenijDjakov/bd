@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="lt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{account.registration}"></title>
+    <th:block th:insert="fragments/head :: head"></th:block>
+    <link th:rel="stylesheet" th:href="@{/assets/styles/login.css}"/>
+</head>
+<body>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<div class="login-form">
+    <h2 class="text-center" th:text="#{account.creation.label}"></h2>
+    <div role="alert" id="registrationResult" style="display: none"></div>
+    <div class="form-group input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+        </div>
+        <input id="userName" class="form-control" th:placeholder="#{account.username}" type="text">
+        <div id="invalidUsername" class="invalid-feedback" style="display: none">
+        </div>
+    </div>
+    <div class="form-group input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+        </div>
+        <input id="email" class="form-control" th:placeholder="#{account.email}" type="email">
+        <div id="invalidEmail" class="invalid-feedback" style="display: none">
+        </div>
+    </div>
+    <div class="form-group input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+        </div>
+        <input id="password" class="form-control" th:placeholder="#{account.password}" type="password">
+        <div id="invalidPassword" class="invalid-feedback" style="display: none">
+        </div>
+    </div>
+    <div class="form-group input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+        </div>
+        <input id="secondPassword" class="form-control" th:placeholder="#{account.repeat.password}" type="password">
+        <div id="passwordNotMatch" class="invalid-feedback" style="display: none">
+        </div>
+    </div>
+    <div class="form-group">
+        <button id="btnSubmitRegistrationForm" class="btn btn-primary btn-block">
+            <span id="spinner" class="spinner-border spinner-border-sm" role="status"
+                  style="display: none" aria-hidden="true"></span>
+            <text th:text="#{account.creation.label}"></text>
+        </button>
+    </div>
+    <p class="text-center">
+        <text th:text="#{account.question}"></text>
+        <a th:href="@{/login}" th:text="#{account.login}"></a>
+    </p>
+</div>
+<script>
+    var invalidUsername = '[[#{invalidUsernameFormat}]]';
+    var invalidEmail = '[[#{invalidEmailFormat}]]';
+    var invalidPassword = '[[#{invalidPasswordFormat}]]';
+    var passwordNotMatch = '[[#{passwordNotMatch}]]';
+</script>
+</body>
+</html>

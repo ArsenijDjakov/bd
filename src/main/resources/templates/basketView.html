@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{account.basket}"></title>
+    <th:block th:insert="fragments/head :: head"></th:block>
+    <link th:rel="stylesheet" th:href="@{/assets/styles/favorites.css}"/>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+</head>
+<body>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<h2 class="text-center mt-5" th:text="#{account.basket}"></h2>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th th:text="#{table.name}"></th>
+                <th:block th:each="shop : ${shops}">
+                    <th>
+                        <img class="shop_logo" th:src="'/assets/images/' + ${shop.getLogoLink()}"
+                             alt="">
+                    </th>
+                </th:block>
+                <th th:text="#{table.actions}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="productEntity, index : ${productEntities}">
+                <td th:text="${index.count}"></td>
+                <td>
+                    <a th:href="@{/product/{id}(id=${productEntity.getProductId()})}">
+                        <text th:text="${productEntity.getProductName()}"></text>
+                    </a>
+                </td>
+                <th:block th:each="shop : ${shops}">
+                    <th:block th:each="shopPrice : ${productEntity.getShopPrices()}">
+                        <th:block th:if="${shop.getId()} == ${shopPrice.getKey()}">
+                            <td th:text="${shopPrice.getValue()} + '€'">
+                            </td>
+                        </th:block>
+                    </th:block>
+                </th:block>
+                <td>
+                    <a href="#" class="view" id="delete"
+                       th:attr="onclick=|removeProduct('${productEntity.getProductId()}')|"
+                       th:title="#{table.actions.remove}" data-toggle="tooltip"><i
+                            class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+
+    function removeProduct(productId) {
+        $.ajax({
+                url: "/account/basket/remove",
+                type: 'POST',
+                data: {productId: productId},
+                headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
+                success: function (data) {
+                    // if (data.message === "success") {
+                    location.reload();
+                    // } else {
+                    //     responseDiv.innerHTML = [[#{submit.fail}]];
+                    //     responseDiv.className = "alert alert-danger";
+                    // }
+                    // responseDiv.style = "display: block";
+                }
+            }
+        );
+    }
+</script>
+</html>

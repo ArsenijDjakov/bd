@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html lang="lt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <th:block th:if="${subCategoryId != null}">
+        <title th:text="#{'subCategory.' + ${subCategoryId}}"></title>
+    </th:block>
+    <th:block th:unless="${subCategoryId != null}">
+        <title th:text="#{'category.' + ${categoryId}}"></title>
+    </th:block>
+    <th:block th:insert="fragments/head :: head"></th:block>
+    <link th:rel="stylesheet" th:href="@{/assets/styles/productList.css}"/>
+</head>
+<body>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<th:block th:if="${subCategoryId != null}">
+    <h2 class="text-center mt-4" th:text="#{'subCategory.' + ${subCategoryId}}"></h2>
+</th:block>
+<th:block th:unless="${subCategoryId != null}">
+    <h2 class="text-center mt-4" th:text="#{'category.' + ${categoryId}}"></h2>
+</th:block>
+<div class="container">
+    <th:block th:unless="${subCategoryId != null}">
+        <text th:text="#{subCategories}"></text>
+        <a th:each="subCategory : ${subCategories}" th:href="'/category/' + ${categoryId} + '/' + ${subCategory.getId()}">
+            <text th:text="#{'subCategory.' + ${subCategory.getId()}}"></text>
+        </a>
+    </th:block>
+    <div class="row">
+        <div class="col-sm-12 mt-4">
+            <form th:action="@{/product/search}" method="post">
+                <div class="input-group">
+                    <input type="search" name="search" id="search" th:placeholder="#{search}" class="form-control"/>
+                    <button type="submit" id="btnSearch" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        <text th:text="#{search}"></text>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="container d-flex justify-content-center mb-50">
+    <div class="row">
+        <div class="col-sm-3 mt-2" th:each="product : ${productPage.content}">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-img-actions">
+                        <a th:href="@{/product/{id}(id=${product.getId()})}">
+                            <img th:src="${product.getImageLink()}" class="card-img img-fluid" width="96" height="350"
+                                 alt="">
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body bg-light text-center">
+                    <div class="mb-2">
+                        <text class="font-weight-semibold mb-2">
+                            <a th:href="@{/product/{id}(id=${product.getId()})}" class="text-default mb-2"
+                               data-abc="true"
+                               th:text="${product.getName()}"></a>
+                        </text>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<nav aria-label="Page navigation example">
+    <ul class="pagination pagination-lg justify-content-center">
+        <li th:if="${productPage.totalPages > 0}" th:each="pageNumber : ${pageNumbers}"
+            th:class="${pageNumber == productPage.number + 1} ? 'page-item active' : 'page-item'">
+            <th:block th:if="${categoryId} == 0">
+                <a th:href="@{/(page=${pageNumber})}"
+                   th:text="${pageNumber}"
+                   class="page-link">
+                    <span th:if="${pageNumber} == ${productPage.number + 1}" class="sr-only">(current)</span>
+                </a>
+            </th:block>
+            <th:block th:unless="${categoryId} == 0">
+                <a th:href="@{/category/{id}(id=${categoryId}, page=${pageNumber})}"
+                   th:text="${pageNumber}"
+                   class="page-link">
+                    <span th:if="${pageNumber} == ${productPage.number + 1}" class="sr-only">(current)</span>
+                </a>
+            </th:block>
+        </li>
+    </ul>
+</nav>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{account.favorites}"></title>
+    <th:block th:insert="fragments/head :: head"></th:block>
+    <link th:rel="stylesheet" th:href="@{/assets/styles/favorites.css}"/>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+</head>
+<body>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<h2 class="text-center mt-5" th:text="#{account.favorites}"></h2>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th th:text="#{table.name}"></th>
+                <th th:text="#{table.price}"></th>
+                <th th:text="#{table.shop}"></th>
+                <th th:text="#{table.actions}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product, index : ${userProducts}">
+                <td th:text="${index.count}"></td>
+                <td>
+                    <a th:href="@{/product/{id}(id=${product.getProductId()})}">
+                        <text th:text="${product.getName()}"></text>
+                    </a>
+                </td>
+                <td>
+                    <text th:text="${product.getMinPrice()} + '€'"></text>
+                </td>
+                <td>
+                    <a th:href="${product.getShopLink()}" target="_blank">
+                        <img class="shop_logo" th:src="'/assets/images/' + ${product.getShopLogoLink()}"
+                             alt="">
+                    </a>
+                </td>
+                <td>
+                    <a th:href="${product.getShopLink()}" target="_blank" class="link"
+                       th:title="#{table.actions.shop}" data-toggle="tooltip"><i
+                            class="fas fa-external-link-alt"></i></a>
+                    <a href="#" class="view" id="delete" th:attr="onclick=|removeProduct('${product.getProductId()}')|"
+                       th:title="#{table.actions.remove}" data-toggle="tooltip"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+
+    function removeProduct(productId) {
+        $.ajax({
+                url: "/account/favorites/remove",
+                type: 'POST',
+                data: {productId: productId},
+                headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
+                success: function (data) {
+                    // if (data.message === "success") {
+                        location.reload();
+                    // } else {
+                    //     responseDiv.innerHTML = [[#{submit.fail}]];
+                    //     responseDiv.className = "alert alert-danger";
+                    // }
+                    // responseDiv.style = "display: block";
+                }
+            }
+        );
+    }
+</script>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="lt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${product.getName()}"></title>
+    <th:block th:insert="fragments/head :: head"></th:block>
+    <link th:rel="stylesheet" th:href="@{/assets/styles/productPage.css}"/>
+</head>
+<body>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<div class="super_container">
+    <div class="single_product">
+        <div class="container-fluid" style=" background-color: #fff; padding: 11px;">
+            <div class="row">
+                <div class="col-lg-4 order-lg-2 order-1">
+                    <div class="image_selected">
+                        <img width="332" height="232" th:src="${product.getImageLink()}" alt="">
+                    </div>
+                </div>
+                <div class="col-lg-6 order-3">
+                    <div class="product_description">
+                        <nav>
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a th:href="@{/}" th:text="#{main.page}"></a></li>
+                                <li class="breadcrumb-item"><a th:href="@{/category/{id}(id=${category.getId()})}"
+                                                               th:text="#{'category.' + ${category.getId()}}"></a></li>
+                                <li class="breadcrumb-item active" th:text="${product.getName()}"></li>
+                            </ol>
+                        </nav>
+                        <div class="product_name" th:text="${product.getName()}"></div>
+                        <th:block th:if="${minPrice}!=null">
+                            <div class="product_price"
+                                 th:text="'Mažiausia kaina ' + ${minPrice.getPrice()} + '€'"></div>
+                            <hr class="singleline">
+                            <div>
+                                <span class="product_info" th:text="'Paskutinį kartą kaina tikrinta '"></span>
+                                <strong class="product_info" th:text="${minPrice.getDate()}"></strong>
+                            </div>
+                        </th:block>
+                        <hr class="singleline">
+                        <div class="col-xs-6">
+                            <th:block th:each="link: ${links}">
+                                <th:block th:each="shop: ${shops}">
+                                    <li th:if="${shop.getId()} == ${link.getShopId()}">
+                                        <text>Pereiti į prekės puslapį</text>
+                                        <a th:href="${link.getProductLink()}" target="_blank">
+                                            <img class="shop_logo" th:src="'/assets/images/' + ${shop.getLogoLink()}"
+                                                 alt="">
+                                        </a>
+                                        <text> parduotuvėje</text>
+                                    </li>
+                                </th:block>
+                            </th:block>
+                            <br>
+                            <div class="alert" role="alert" id="userSubmissionResult" style="display: none"></div>
+                            <button type="button" class="btn btn-success shop-button"
+                                    id="btnFavorites" style="display: none">Pridėti į mėgstamus
+                            </button>
+                            <button type="button" class="btn btn-primary shop-button"
+                                    id="btnBasket" style="display: none">Pridėti į palyginimo krepšelį
+                            </button>
+                        </div>
+                        <hr class="singleline">
+                        <form>
+                            <div class="col-xs-6">
+                                <div class="input-group mb-3">
+                                    <input id="emailAddress" name="email" type="text"
+                                           class="form-control" placeholder="Jūsų el. paštas"
+                                           pattern="">
+                                </div>
+                                <div class="" role="alert" id="emailSubmissionResult" style="display: none"></div>
+                                <button id="emailSubmission" type="button" class="btn btn-secondary shop-button">
+                                    Pranešti kai kaina sumažės
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-underline">
+                <div class="col-md-6"><span class=" deal-text" th:text="#{product.price.history}"></span></div>
+            </div>
+            <div class="row-graph">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+
+    $(function () {
+        if (checkLogin() === true) {
+            $('#btnFavorites').show();
+            $('#btnBasket').show();
+        } else {
+            $('#btnFavorites').hide();
+            $('#btnBasket').hide();
+        }
+    });
+
+    $("#btnFavorites").click(function () {
+        var responseDiv = $("#userSubmissionResult");
+        responseDiv.css("display", "none");
+        $.ajax({
+                url: "/account/favorites/" + [[${product.getId()}]],
+                type: 'POST',
+                headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
+                success: function (data) {
+                    if (data.message === "success") {
+                        responseDiv.text([[#{product.favorite.success}]]);
+                        responseDiv.removeClass("alert-danger");
+                        responseDiv.addClass("alert-success");
+                    } else if (data.message === "alreadyInFavorites") {
+                        responseDiv.text([[#{alreadyInFavorites}]]);
+                        responseDiv.removeClass("alert-success");
+                        responseDiv.addClass("alert-danger");
+                    } else {
+                        responseDiv.text([[#{submit.fail}]]);
+                        responseDiv.removeClass("alert-success");
+                        responseDiv.addClass("alert-danger");
+                    }
+                    responseDiv.css("display", "block");
+                },
+                error: function () {
+                    responseDiv.text([[#{submit.fail}]]);
+                    responseDiv.removeClass("alert-success");
+                    responseDiv.addClass("alert-danger");
+                    responseDiv.css("display", "block");
+                }
+            }
+        );
+    });
+
+    $("#btnBasket").click(function () {
+        var responseDiv = $("#userSubmissionResult");
+        responseDiv.css("display", "none");
+        $.ajax({
+                url: "/account/basket/" + [[${product.getId()}]],
+                type: 'POST',
+                headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
+                success: function (data) {
+                    if (data.message === "success") {
+                        responseDiv.text([[#{product.favorite.success}]]);
+                        responseDiv.removeClass("alert-danger");
+                        responseDiv.addClass("alert-success");
+                    } else if (data.message === "alreadyInBasket") {
+                        responseDiv.text([[#{alreadyInBasket}]]);
+                        responseDiv.removeClass("alert-success");
+                        responseDiv.addClass("alert-danger");
+                    } else {
+                        responseDiv.text([[#{submit.fail}]]);
+                        responseDiv.removeClass("alert-success");
+                        responseDiv.addClass("alert-danger");
+                    }
+                    responseDiv.css("display", "block");
+                },
+                error: function () {
+                    responseDiv.text([[#{submit.fail}]]);
+                    responseDiv.removeClass("alert-success");
+                    responseDiv.addClass("alert-danger");
+                    responseDiv.css("display", "block");
+                }
+            }
+        );
+    });
+
+    $("#emailSubmission").click(function () {
+        var email = $("#emailAddress").val();
+        var responseDiv = document.getElementById("emailSubmissionResult");
+        const regex = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
+        if (!regex.test(email)) {
+            responseDiv.innerHTML = [[#{email.validation.fail}]];
+            responseDiv.className = "invalid-feedback";
+            responseDiv.style = "display: block";
+            return;
+        }
+        $.ajax({
+                url: [[${product.getId()}]] + "/subscribe",
+                type: 'POST',
+                data: {email: email},
+                headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
+                success: function (data) {
+                    if (data.message === "success") {
+                        $("#emailAddress").val('');
+                        responseDiv.innerHTML = [[#{email.submit.success}]];
+                        responseDiv.className = "alert alert-success";
+                    } else if (data.message === "alreadySub") {
+                        responseDiv.innerHTML = [[#{email.submit.alreadySub}]];
+                        responseDiv.className = "alert alert-danger";
+                    } else {
+                        responseDiv.innerHTML = [[#{submit.fail}]];
+                        responseDiv.className = "alert alert-danger";
+                    }
+                    responseDiv.style = "display: block";
+                }
+            }
+        );
+    });
+
+    chartColors = {
+        1: 'rgb(255, 99, 132)',
+        2: 'rgb(54, 162, 235)',
+        3: 'rgb(255, 205, 86)',
+        4: 'rgb(75, 192, 192)',
+        5: 'rgb(255, 159, 64)',
+        6: 'rgb(153, 102, 255)',
+        7: 'rgb(201, 203, 207)'
+    };
+
+    const productPrices = [[${productPrices}]];
+
+    const dates = [...new Set(productPrices
+        .sort(function (productPrice1, productPrice2) {
+            return new Date(productPrice1.date) - new Date(productPrice2.date);
+        }).map(productPrice => productPrice.date))];
+
+    const shops = [[${shops}]];
+    var shopDatasets = [];
+
+    shops.forEach(function (item, index) {
+
+        var prices = productPrices.filter(productPrice => productPrice.shopId === item.id)
+            .sort(function (a, b) {
+                return new Date(a.date) - new Date(b.date);
+            }).map(productPrice => productPrice.price);
+
+        if (prices.length !== 0) {
+            shopDatasets.push({
+                label: item.name,
+                borderColor: chartColors[item.id],
+                backgroundColor: chartColors[item.id],
+                fill: false,
+                data: prices,
+                yAxisID: 'y-axis-1',
+            });
+        }
+    });
+
+    window.onload = function () {
+        var ctx = document.getElementById('canvas').getContext('2d');
+        window.myLine = Chart.Line(ctx, {
+            data: {
+                labels: dates,
+                datasets: shopDatasets
+            },
+            options: {
+                responsive: true,
+                hoverMode: 'index',
+                stacked: false,
+                scales: {
+                    yAxes: [{
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        id: 'y-axis-1',
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                    }],
+                }
+            }
+        });
+    };
+</script>
+</body>
+</html>

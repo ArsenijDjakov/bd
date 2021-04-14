@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html lang="lt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="#{system.name}"></title>
+    <th:block th:insert="fragments/head :: head"></th:block>
+</head>
+<body>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<div class="container">
+    <div class="row">
+        <div class="col">
+<h1>404 - page not found</h1>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.0.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/popper.js/1.12.9-1/umd/popper.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/4.0.0-2/js/bootstrap.min.js}"></script>
+
+</body>
+</html>

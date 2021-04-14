@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="lt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{account.login}"></title>
+    <th:block th:insert="fragments/head :: head"></th:block>
+    <link th:rel="stylesheet" th:href="@{/assets/styles/login.css}"/>
+</head>
+<body>
+<script>
+    $(function () {
+        if (sessionStorage.getItem("registration") === 'true') {
+            $('#afterRegistration').show();
+            sessionStorage.removeItem("registration");
+        }
+    });
+</script>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<div class="login-form">
+    <div style="display: none" id="afterRegistration" class="alert alert-success" role="alert"
+         th:text="#{account.registration.success}">
+    </div>
+    <h2 class="text-center" th:text="#{account.login}"></h2>
+    <div role="alert" id="loginResult" style="display: none"></div>
+    <div class="form-group input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+        </div>
+        <input type="text" class="form-control" th:placeholder="#{account.username}" id="userName"
+               required="required" value="Rokas">
+    </div>
+    <div class="form-group input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+        </div>
+        <input type="password" class="form-control" th:placeholder="#{account.password}" id="password"
+               required="required">
+    </div>
+    <div class="form-group">
+        <button id="btnSubmitLoginForm" class="btn btn-primary btn-block">
+            <span id="spinner" class="spinner-border spinner-border-sm" role="status"
+                  style="display: none" aria-hidden="true"></span>
+            <text th:text="#{account.login}"></text>
+        </button>
+    </div>
+    <div class="clearfix">
+        <!--        <a href="#" class="float-right">Forgot Password?</a>-->
+    </div>
+    <p class="text-center"><a th:href="@{/registration}" th:text="#{account.creation.label}"></a></p>
+</div>
+<script>
+    var loginFailLabel = '[[#{account.login.fail}]]';
+</script>
+</body>
+</html>
