@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="pagination">
+  <nav aria-label="Page navigation" th:if="${productPages.totalPages > 0}">
+    <ul class="pagination pagination-lg justify-content-center">
+      <li th:class="${productPages.number == 0} ? 'page-item disabled' : 'page-item'">
+        <th:block th:if="${subCategoryId} == null">
+          <th:block th:if="${categoryId} == 0">
+            <a class="page-link" th:href="@{/(page=1)}" th:text="#{page.first}"></a>
+          </th:block>
+          <th:block th:unless="${categoryId} == 0">
+            <a class="page-link" th:href="@{/category/{id}(id=${categoryId}, page=1)}" th:text="#{page.first}"></a>
+          </th:block>
+        </th:block>
+        <th:block th:unless="${subCategoryId} == null">
+          <a class="page-link" th:href="@{/category/{categoryId}/{subCategoryId}(categoryId=${categoryId},
+           subCategoryId=${subCategoryId}, page=1)}" th:text="#{page.first}"></a>
+        </th:block>
+      </li>
+      <li th:class="${productPages.number == 0} ? 'page-item disabled' : 'page-item'">
+        <th:block th:if="${subCategoryId} == null">
+          <th:block th:if="${categoryId} == 0">
+            <a class="page-link" th:href="@{/(page=${productPages.number})}">&laquo;</a>
+          </th:block>
+          <th:block th:unless="${categoryId} == 0">
+            <a class="page-link" th:href="@{/category/{id}(id=${categoryId}, page=${productPages.number})}">&laquo;</a>
+          </th:block>
+        </th:block>
+        <th:block th:unless="${subCategoryId} == null">
+          <a class="page-link" th:href="@{/category/{categoryId}/{subCategoryId}(categoryId=${categoryId},
+           subCategoryId=${subCategoryId}, page=${productPages.number})}">&laquo;</a>
+        </th:block>
+      </li>
+      <li th:class="${productPages.number == (page - 1)} ? 'page-item active' : 'page-item'"
+          th:each="page : ${#numbers.sequence(pager.startPage, pager.endPage)}">
+        <th:block th:if="${subCategoryId} == null">
+          <th:block th:if="${categoryId} == 0">
+            <a th:href="@{/(page=${page})}" th:text="${page}" class="page-link">
+              <span th:if="${page} == ${productPages.number + 1}" class="sr-only">(current)</span>
+            </a>
+          </th:block>
+          <th:block th:unless="${categoryId} == 0">
+            <a th:href="@{/category/{id}(id=${categoryId}, page=${page})}" th:text="${page}" class="page-link">
+              <span th:if="${page} == ${productPages.number + 1}" class="sr-only">(current)</span></a>
+          </th:block>
+        </th:block>
+        <th:block th:unless="${subCategoryId} == null">
+          <a th:href="@{/category/{categoryId}/{subCategoryId}(categoryId=${categoryId}, subCategoryId=${subCategoryId}, page=${page})}"
+             th:text="${page}" class="page-link">
+            <span th:if="${page} == ${productPages.number + 1}" class="sr-only">(current)</span></a>
+        </th:block>
+      </li>
+      <li th:class="${productPages.number + 1 == productPages.totalPages} ? 'page-item disabled' : 'page-item'">
+        <th:block th:if="${subCategoryId} == null">
+          <th:block th:if="${categoryId} == 0">
+            <a class="page-link" th:href="@{/(page=${productPages.number + 2})}">&raquo;</a>
+          </th:block>
+          <th:block th:unless="${categoryId} == 0">
+            <a class="page-link" th:href="@{/category/{id}(id=${categoryId}, page=${productPages.number + 2})}">&raquo;</a>
+          </th:block>
+        </th:block>
+        <th:block th:unless="${subCategoryId} == null">
+          <a class="page-link" th:href="@{/category/{categoryId}/{subCategoryId}(categoryId=${categoryId},
+           subCategoryId=${subCategoryId}, page=${productPages.number + 2})}">&raquo;</a>
+        </th:block>
+      </li>
+      <li th:class="${productPages.number + 1 == productPages.totalPages} ? 'page-item disabled' : 'page-item'">
+        <th:block th:if="${subCategoryId} == null">
+          <th:block th:if="${categoryId} == 0">
+            <a class="page-link" th:href="@{/(page=${productPages.totalPages})}" th:text="#{page.last}"></a>
+          </th:block>
+          <th:block th:unless="${categoryId} == 0">
+            <a class="page-link" th:href="@{/category/{id}(id=${categoryId}, page=${productPages.totalPages})}" th:text="#{page.last}"></a>
+          </th:block>
+        </th:block>
+        <th:block th:unless="${subCategoryId} == null">
+          <a class="page-link" th:href="@{/category/{categoryId}/{subCategoryId}(categoryId=${categoryId},
+           subCategoryId=${subCategoryId}, page=${productPages.totalPages})}" th:text="#{page.last}"></a>
+        </th:block>
+      </li>
+    </ul>
+  </nav>
+</th:block>
+</html>

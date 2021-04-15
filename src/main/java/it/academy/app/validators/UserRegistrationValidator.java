@@ -16,6 +16,9 @@ public class UserRegistrationValidator {
     EmailValidator emailValidator;
 
     @Autowired
+    PasswordValidator passwordValidator;
+
+    @Autowired
     UserRepository userRepository;
 
     public boolean checkForm(User user) {
@@ -39,7 +42,7 @@ public class UserRegistrationValidator {
     }
 
     private void checkPassword (String password) {
-        if (password==null || password.isEmpty() || password.contains(" ")) {
+        if (password==null || !passwordValidator.checkRegex(password)) {
             throw new ValidationException(ErrorMessages.invalidPasswordFormat);
         }
     }

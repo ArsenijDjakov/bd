@@ -1,5 +1,6 @@
 package it.academy.app.controllers;
 
+import it.academy.app.models.PagerModel;
 import it.academy.app.models.product.Category;
 import it.academy.app.models.product.Product;
 import it.academy.app.models.product.SubCategory;
@@ -45,25 +46,17 @@ public class CategoryController {
     @GetMapping("/category/{categoryId}")
     public ModelAndView getProductsByCategory(@PathVariable("categoryId") long categoryId, @RequestParam("page") Optional<Integer> page,
                                               @RequestParam("size") Optional<Integer> size) {
-        ModelAndView modelAndView = new ModelAndView("productGrid");
         List<Product> products = productRepository.findByCategoryId(categoryId);
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(20);
         List<SubCategory> subCategories = subCategoryRepository.findByCategoryId(categoryId);
-
-        Page<Product> productPage = paginationService.findPaginated(products, PageRequest.of(currentPage - 1, pageSize));
-
-        int totalPages = productPage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                    .boxed()
-                    .collect(Collectors.toList());
-            modelAndView.addObject("pageNumbers", pageNumbers);
-        }
-        return modelAndView
+        Page<Product> productPages = paginationService.findPaginated(products, PageRequest.of(currentPage - 1, pageSize));
+        PagerModel pager = new PagerModel(productPages.getTotalPages(),productPages.getNumber());
+        return new ModelAndView("productGrid")
                 .addObject("categoryId", categoryId)
                 .addObject("subCategories", subCategories)
-                .addObject("productPage", productPage)
+                .addObject("productPages", productPages)
+                .addObject("pager", pager)
                 .addObject("products", products);
     }
 
@@ -71,24 +64,15 @@ public class CategoryController {
     public ModelAndView getProductsBySubCategory(@PathVariable("categoryId") long categoryId,
                                                  @PathVariable("subCategoryId") long subCategoryId, @RequestParam("page") Optional<Integer> page,
                                                  @RequestParam("size") Optional<Integer> size) {
-        ModelAndView modelAndView = new ModelAndView("productGrid");
         List<Product> products = productRepository.findBySubCategoryId(subCategoryId);
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(20);
-
-        Page<Product> productPage = paginationService.findPaginated(products, PageRequest.of(currentPage - 1, pageSize));
-
-        int totalPages = productPage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                    .boxed()
-                    .collect(Collectors.toList());
-            modelAndView.addObject("pageNumbers", pageNumbers);
-        }
-
-        return modelAndView
+        Page<Product> productPages = paginationService.findPaginated(products, PageRequest.of(currentPage - 1, pageSize));
+        PagerModel pager = new PagerModel(productPages.getTotalPages(),productPages.getNumber());
+        return new ModelAndView("productGrid")
                 .addObject("subCategoryId", subCategoryId)
-                .addObject("productPage", productPage)
+                .addObject("productPages", productPages)
+                .addObject("pager", pager)
                 .addObject("products", products);
     }
 }

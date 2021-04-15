@@ -15,7 +15,7 @@
 <nav th:insert="fragments/navigation :: navigation"></nav>
 <h2 class="text-center mt-5" th:text="#{account.basket}"></h2>
 <div class="container">
-    <div class="table-responsive">
+    <div class="table-responsive" th:if="${productEntities} !=null">
         <table class="table table-striped table-hover table-bordered">
             <thead>
             <tr>
@@ -32,8 +32,8 @@
             </thead>
             <tbody>
             <tr th:each="productEntity, index : ${productEntities}">
-                <td th:text="${index.count}"></td>
-                <td>
+                <td class="text-center" th:text="${index.count}"></td>
+                <td class="text-center">
                     <a th:href="@{/product/{id}(id=${productEntity.getProductId()})}">
                         <text th:text="${productEntity.getProductName()}"></text>
                     </a>
@@ -41,20 +41,47 @@
                 <th:block th:each="shop : ${shops}">
                     <th:block th:each="shopPrice : ${productEntity.getShopPrices()}">
                         <th:block th:if="${shop.getId()} == ${shopPrice.getKey()}">
-                            <td th:text="${shopPrice.getValue()} + '€'">
+                            <td class="text-center" >
+                                <th:block th:if="${shopPrice.getValue()}==0">
+                                    <strong>
+                                        <text>N/A</text>
+                                    </strong>
+                                </th:block>
+                                <th:block th:unless="${shopPrice.getValue()}==0">
+                                    <text th:text="${shopPrice.getValue()} + '€'"></text>
+                                </th:block>
                             </td>
                         </th:block>
                     </th:block>
                 </th:block>
-                <td>
+                <td class="text-center">
                     <a href="#" class="view" id="delete"
                        th:attr="onclick=|removeProduct('${productEntity.getProductId()}')|"
                        th:title="#{table.actions.remove}" data-toggle="tooltip"><i
                             class="fa fa-trash"></i></a>
                 </td>
             </tr>
+            <tr class="table-info">
+                <td colspan="2" class="text-center"><h5 th:text="#{table.sum.total}"></h5></td>
+                <th:block th:each="shop : ${shops}">
+                    <th:block th:each="shopSum : ${totalSums}">
+                        <th:block th:if="${shop.getId()} == ${shopSum.getKey()}">
+                            <td class="text-center">
+                                <strong>
+                                    <text th:text="${#numbers.formatDecimal(shopSum.getValue(),1,'COMMA',2,'POINT')} + '€'">
+                                    </text>
+                                </strong>
+                            </td>
+                        </th:block>
+                    </th:block>
+                </th:block>
+                <td></td>
+            </tr>
             </tbody>
         </table>
+    </div>
+    <div class="table-responsive" th:unless="${productEntities} !=null">
+        Basket is empty
     </div>
 </div>
 </body>

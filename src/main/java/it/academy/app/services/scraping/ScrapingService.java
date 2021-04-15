@@ -139,6 +139,7 @@ public class ScrapingService {
                         LocalDate.now().toString(), price));
                 notificationService.sendNotifications(productId, price);
             }
+            addProductLink(shopId, productScratch);
         }
         allTitles = new ArrayList<>();
         allPrices = new ArrayList<>();
@@ -171,7 +172,7 @@ public class ScrapingService {
                     price = price.substring(price.indexOf(' '));
                 }
                 allPrices.add(price);
-//                productLinks.add(category);
+                productLinks.add(category);
 //                grusteRepository.save(new ProductNameGruste(titles.get(j).asText()));
             }
             i++;
@@ -209,7 +210,7 @@ public class ScrapingService {
             price = price.replace("\u20AC", "");
             price = price.replace(",", ".");
             allPrices.add(price);
-//            productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
+            productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
 //            ciaMarketRepository.save(new ProductNameCiaMarket(titles.get(j).asText()));
         }
     }
@@ -244,8 +245,7 @@ public class ScrapingService {
             price = price.replace("\u20AC", "");
             price = price.replace(",", ".");
             allPrices.add(price);
-
-//            productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
+            productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
 //            aibeRepository.save(new ProductAibe(titles.get(j).asText()));
         }
     }
@@ -313,7 +313,7 @@ public class ScrapingService {
                 price = price.replace("\u20AC", "");
                 price = price.replace(",", ".");
                 allPrices.add(price);
-//                productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
+                productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
 //                utenosPrekybaRepository.save(new ProductUtenosPrekyba(titles.get(j).asText()));
             }
             i++;

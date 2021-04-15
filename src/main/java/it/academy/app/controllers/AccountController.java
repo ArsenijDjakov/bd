@@ -126,8 +126,13 @@ public class AccountController {
             UserDetails userDetails = userService.loadUserByUsername(username);
             if (jwtTokenUtil.validateToken(token, userDetails)) {
                 ArrayList<FavoriteProduct> favoriteProducts = favoriteProductService.getUserFavoriteProducts(username);
-                return new ModelAndView("favoritesListView")
-                        .addObject("userProducts", favoriteProducts);
+                ModelAndView modelAndView =  new ModelAndView("favoritesListView");
+                if (!favoriteProducts.isEmpty()) {
+                    modelAndView.addObject("userProducts", favoriteProducts);
+                } else {
+                    modelAndView.addObject("userProducts", null);
+                }
+                return modelAndView;
             }
             return new ModelAndView("loginView");
         } catch (Exception e) {
@@ -172,28 +177,42 @@ public class AccountController {
                 UserBasket basket = userBasketRepository.findByUserId(user.getId());
                 List<Shop> shops = shopRepository.findAll().stream().sorted(Comparator.comparing(Shop::getName)).collect(Collectors.toList());
                 List<BasketProduct> basketProducts = basketProductRepository.findByBasketId(basket.getId());
-                ArrayList<BasketProductEntity> productEntities = new ArrayList<>();
-                for (int i=0;i<basketProducts.size();i++) {
-                    BasketProduct basketProduct = basketProducts.get(i);
-                    Product product = productRepository.findById(basketProduct.getProductId());
-                    HashMap<Long, Double> shopPrices = new HashMap<>();
-                    for(int j=0;j<shops.size();j++) {
-                        Shop shop = shops.get(j);
-                        List<ProductPrice> productPrices = productPriceRepository
-                                .findByShopIdAndProductId(shop.getId(), basketProduct.getProductId());
-                        if (!productPrices.isEmpty()) {
-                            ProductPrice lastProductPrice = productPrices.stream().max(Comparator.comparing(ProductPrice::getDate)).get();
-                            shopPrices.put(shop.getId(), lastProductPrice.getPrice());
-                        } else {
-                            shopPrices.put(shop.getId(), 0.0);
+                ModelAndView modelAndView = new ModelAndView("basketView");
+                if (!basketProducts.isEmpty()) {
+                    ArrayList<BasketProductEntity> productEntities = new ArrayList<>();
+                    for (int i=0;i<basketProducts.size();i++) {
+                        BasketProduct basketProduct = basketProducts.get(i);
+                        Product product = productRepository.findById(basketProduct.getProductId());
+                        HashMap<Long, Double> shopPrices = new HashMap<>();
+                        for(int j=0;j<shops.size();j++) {
+                            Shop shop = shops.get(j);
+                            List<ProductPrice> productPrices = productPriceRepository
+                                    .findByShopIdAndProductId(shop.getId(), basketProduct.getProductId());
+                            if (!productPrices.isEmpty()) {
+                                ProductPrice lastProductPrice = productPrices.stream().max(Comparator.comparing(ProductPrice::getDate)).get();
+                                shopPrices.put(shop.getId(), lastProductPrice.getPrice());
+                            } else {
+                                shopPrices.put(shop.getId(), 0.0);
+                            }
                         }
+                        productEntities.add(new BasketProductEntity(basketProduct.getProductId(), product.getName(),
+                                shopPrices));
                     }
-                    productEntities.add(new BasketProductEntity(basketProduct.getProductId(), product.getName(),
-                            shopPrices));
+                    HashMap<Long, Double> totalSums = new HashMap<>();
+                    for (int i=0;i<shops.size();i++) {
+                        Shop currentShop = shops.get(i);
+                        double sum = 0.0;
+                        for (BasketProductEntity productEntity : productEntities) {
+                            sum += productEntity.getShopPrices().get(currentShop.getId());
+                        }
+                        totalSums.put(shops.get(i).getId(), sum);
+                    }
+                    modelAndView.addObject("productEntities", productEntities)
+                    .addObject("totalSums", totalSums);
+                } else {
+                    modelAndView.addObject("productEntities", null);
                 }
-                return new ModelAndView("basketView")
-                        .addObject("productEntities", productEntities)
-                        .addObject("shops", shops);
+                return  modelAndView.addObject("shops", shops);
             }
             return new ModelAndView("loginView");
         } catch (Exception e) {

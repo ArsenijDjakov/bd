@@ -149,7 +149,8 @@ function validateForm () {
         counter++;
     }
     var password = $("#password").val();
-    if (password.length === 0) {
+    const passRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,10}$/;
+    if (!passRegex.test(password)) {
         passwordValidation.text(invalidPassword);
         passwordValidation.show();
         counter++;
@@ -169,7 +170,8 @@ function validatePasswordChangeForm() {
     var newPasswordValidation = $("#invalidNewPassword");
     var secondNewPasswordValidation = $("#passwordNotMatch");
     var password = $("#newPassword").val();
-    if (password.length === 0) {
+    const passRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,10}$/;
+    if (!passRegex.test(password)) {
         newPasswordValidation.text(invalidPasswordFormat);
         newPasswordValidation.show();
         counter++;

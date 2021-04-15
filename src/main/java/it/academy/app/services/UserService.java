@@ -1,10 +1,14 @@
 package it.academy.app.services;
 
 import it.academy.app.exception.IncorrectDataException;
+import it.academy.app.exception.ValidationException;
 import it.academy.app.models.user.User;
 import it.academy.app.models.user.UserBasket;
 import it.academy.app.repositories.user.UserBasketRepository;
 import it.academy.app.repositories.user.UserRepository;
+import it.academy.app.validators.ErrorMessages;
+import it.academy.app.validators.PasswordValidator;
+import org.apache.bcel.verifier.statics.Pass1Verifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,6 +20,9 @@ import java.util.ArrayList;
 
 @Service
 public class UserService implements UserDetailsService {
+
+    @Autowired
+    PasswordValidator passwordValidator;
 
     @Autowired
     UserRepository userRepository;
@@ -39,12 +46,15 @@ public class UserService implements UserDetailsService {
     }
 
     public User updateUserPassword(String username, String oldPassword, String newPassword) throws IncorrectDataException {
-        User user = getUser(username, oldPassword);
-        userRepository.delete(user);
-        String hashedPass = BCrypt.hashpw(newPassword, BCrypt.gensalt(15));
-        user.setPassword(hashedPass);
-        userRepository.save(user);
-        return userRepository.findByUsername(username);
+        if (passwordValidator.checkRegex(newPassword)) {
+            User user = getUser(username, oldPassword);
+            userRepository.delete(user);
+            String hashedPass = BCrypt.hashpw(newPassword, BCrypt.gensalt(15));
+            user.setPassword(hashedPass);
+            userRepository.save(user);
+            return userRepository.findByUsername(username);
+        }
+        throw new ValidationException(ErrorMessages.invalidPasswordFormat);
     }
 
     public void addNewUser(User user) {
