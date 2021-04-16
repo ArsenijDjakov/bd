@@ -8,10 +8,10 @@ public enum ErrorMessages {
             return "Invalid username format!";
         }
     },
-    illegalCharactersUsed {
+    textTooLong {
         @Override
         public String toString() {
-            return "Field is empty";
+            return "Text is too long!";
         }
     },
     invalidPasswordFormat {

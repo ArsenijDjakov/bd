@@ -3,7 +3,6 @@ package it.academy.app.validators;
 import it.academy.app.exception.ValidationException;
 import it.academy.app.models.user.User;
 import it.academy.app.repositories.user.UserRepository;
-import it.academy.app.shared.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,12 +43,6 @@ public class UserRegistrationValidator {
     private void checkPassword (String password) {
         if (password==null || !passwordValidator.checkRegex(password)) {
             throw new ValidationException(ErrorMessages.invalidPasswordFormat);
-        }
-    }
-
-    public void checkIsStatusInProgress(String status) {
-        if (!status.equals(Status.INPROGRESS.getStatusInLithuanian())) {
-            throw new ValidationException(ErrorMessages.invalidStatus);
         }
     }
 

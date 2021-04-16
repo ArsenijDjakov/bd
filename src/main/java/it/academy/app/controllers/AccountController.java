@@ -2,6 +2,7 @@ package it.academy.app.controllers;
 
 import it.academy.app.configs.JwtTokenUtil;
 import it.academy.app.exception.IncorrectDataException;
+import it.academy.app.exception.ValidationException;
 import it.academy.app.models.BasketProduct;
 import it.academy.app.models.BasketProductEntity;
 import it.academy.app.models.product.FavoriteProduct;
@@ -180,12 +181,10 @@ public class AccountController {
                 ModelAndView modelAndView = new ModelAndView("basketView");
                 if (!basketProducts.isEmpty()) {
                     ArrayList<BasketProductEntity> productEntities = new ArrayList<>();
-                    for (int i=0;i<basketProducts.size();i++) {
-                        BasketProduct basketProduct = basketProducts.get(i);
+                    for (BasketProduct basketProduct : basketProducts) {
                         Product product = productRepository.findById(basketProduct.getProductId());
                         HashMap<Long, Double> shopPrices = new HashMap<>();
-                        for(int j=0;j<shops.size();j++) {
-                            Shop shop = shops.get(j);
+                        for (Shop shop : shops) {
                             List<ProductPrice> productPrices = productPriceRepository
                                     .findByShopIdAndProductId(shop.getId(), basketProduct.getProductId());
                             if (!productPrices.isEmpty()) {
@@ -199,13 +198,12 @@ public class AccountController {
                                 shopPrices));
                     }
                     HashMap<Long, Double> totalSums = new HashMap<>();
-                    for (int i=0;i<shops.size();i++) {
-                        Shop currentShop = shops.get(i);
+                    for (Shop currentShop : shops) {
                         double sum = 0.0;
                         for (BasketProductEntity productEntity : productEntities) {
                             sum += productEntity.getShopPrices().get(currentShop.getId());
                         }
-                        totalSums.put(shops.get(i).getId(), sum);
+                        totalSums.put(currentShop.getId(), sum);
                     }
                     modelAndView.addObject("productEntities", productEntities)
                     .addObject("totalSums", totalSums);
@@ -218,6 +216,11 @@ public class AccountController {
         } catch (Exception e) {
             return new ModelAndView("loginView");
         }
+    }
+
+    @ExceptionHandler
+    public ModelAndView handleException() {
+        return new ModelAndView("error");
     }
 
 }

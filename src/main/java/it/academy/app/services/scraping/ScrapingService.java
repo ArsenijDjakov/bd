@@ -139,7 +139,7 @@ public class ScrapingService {
                         LocalDate.now().toString(), price));
                 notificationService.sendNotifications(productId, price);
             }
-            addProductLink(shopId, productScratch);
+//            addProductLink(shopId, productScratch);
         }
         allTitles = new ArrayList<>();
         allPrices = new ArrayList<>();

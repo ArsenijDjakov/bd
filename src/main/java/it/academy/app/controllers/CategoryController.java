@@ -46,7 +46,7 @@ public class CategoryController {
     @GetMapping("/category/{categoryId}")
     public ModelAndView getProductsByCategory(@PathVariable("categoryId") long categoryId, @RequestParam("page") Optional<Integer> page,
                                               @RequestParam("size") Optional<Integer> size) {
-        List<Product> products = productRepository.findByCategoryId(categoryId);
+        List<Product> products = productRepository.findByCategoryId(categoryId).stream().sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(20);
         List<SubCategory> subCategories = subCategoryRepository.findByCategoryId(categoryId);
@@ -64,7 +64,7 @@ public class CategoryController {
     public ModelAndView getProductsBySubCategory(@PathVariable("categoryId") long categoryId,
                                                  @PathVariable("subCategoryId") long subCategoryId, @RequestParam("page") Optional<Integer> page,
                                                  @RequestParam("size") Optional<Integer> size) {
-        List<Product> products = productRepository.findBySubCategoryId(subCategoryId);
+        List<Product> products = productRepository.findBySubCategoryId(subCategoryId).stream().sorted(Comparator.comparing(Product::getName)).collect(Collectors.toList());
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(20);
         Page<Product> productPages = paginationService.findPaginated(products, PageRequest.of(currentPage - 1, pageSize));

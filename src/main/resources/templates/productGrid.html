@@ -19,7 +19,7 @@
 <th:block th:unless="${subCategoryId != null}">
     <h2 class="text-center mt-4" th:text="#{'category.' + ${categoryId}}"></h2>
 </th:block>
-<div class="container">
+<div class="container" th:if="${!productPages.isEmpty()}">
     <th:block th:unless="${subCategoryId != null}">
         <text th:text="#{subCategories}"></text>
         <a th:each="subCategory : ${subCategories}"
@@ -29,7 +29,7 @@
     </th:block>
     <div class="row">
         <div class="col-sm-12 mt-4">
-            <form th:action="@{/product/search}" method="post">
+            <form th:action="@{/product}" method="GET">
                 <div class="input-group">
                     <input type="search" name="search" id="search" th:placeholder="#{search}" class="form-control"/>
                     <button type="submit" id="btnSearch" class="btn btn-primary">
@@ -66,6 +66,11 @@
         </div>
     </div>
 </div>
-<nav th:insert="fragments/pagination :: pagination"></nav>
+<th:block th:if="${!productPages.isEmpty()}">
+    <nav th:insert="fragments/pagination :: pagination"></nav>
+</th:block>
+<div class="text-center mt-4" th:unless="${!productPages.isEmpty()}">
+    No products provided
+</div>
 </body>
 </html>

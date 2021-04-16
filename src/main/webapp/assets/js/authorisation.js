@@ -1,4 +1,12 @@
 $(function () {
+    var exp = sessionStorage.getItem("exp");
+    if (exp) {
+       if(exp<Date.now()) {
+           cleanSession();
+           location.reload();
+        }
+    }
+
     $("#btnSubmitLoginForm").click(function () {
         var username = $("#userName").val();
         var password = $("#password").val();
@@ -25,14 +33,12 @@ $(function () {
                 sessionStorage.setItem("token", response.token);
                 sessionStorage.setItem("username", response.username);
                 sessionStorage.setItem("userEmail", response.email);
+                sessionStorage.setItem("exp", response.exp);
                 window.location.href="/";
             }
 
         });
     });
-});
-
-$(function () {
     $("#btnSubmitRegistrationForm").click(function () {
         clearValidations();
         if(validateForm()===false){
@@ -68,9 +74,6 @@ $(function () {
 
         });
     });
-});
-
-$(function () {
     $("#btnSubmitPasswordForm").click(function () {
         clearPasswordValidations();
         if(validatePasswordChangeForm()===false){
@@ -102,9 +105,6 @@ $(function () {
             }
         });
     });
-});
-
-$(function () {
     $("#logout").click(function () {
         $.ajax({
             cache: true,
@@ -209,6 +209,7 @@ function checkLogin() {
 function cleanSession() {
     sessionStorage.removeItem("loggedIn");
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("exp");
     sessionStorage.removeItem("currentUsername");
     sessionStorage.removeItem("currentUserEmail");
 }

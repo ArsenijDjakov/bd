@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -35,7 +36,7 @@ public class AuthenticationController {
 
     @PostMapping
     @RequestMapping(value = "/login")
-    public ResponseEntity<?> createAuthenticationToken(HttpSession httpSession, @RequestBody JwtRequest authenticationRequest) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
@@ -45,14 +46,13 @@ public class AuthenticationController {
         final User user = userRepository.findByUsername(userDetails.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
-        httpSession.setAttribute("loggedIn", true);
-        return ResponseEntity.ok(new JwtResponse(token, user.getUsername(), user.getEmail()));
+        Date exp = jwtTokenUtil.getExpirationDateFromToken(token);
+        return ResponseEntity.ok(new JwtResponse(token, user.getUsername(), user.getEmail(), exp));
     }
 
     @PostMapping
     @RequestMapping(value = "/logout")
-    public Map createAuthenticationToken(HttpSession httpSession) {
-        httpSession.removeAttribute("loggedIn");
+    public Map createAuthenticationToken() {
         return Map.of("message", "success");
     }
 

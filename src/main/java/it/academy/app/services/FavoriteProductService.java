@@ -65,8 +65,7 @@ public class FavoriteProductService {
         User user = userRepository.findByUsername(username);
         List<UserProduct> userProducts = userProductRepository.findByUserId(user.getId());
         ArrayList<FavoriteProduct> favoriteProducts = new ArrayList<>();
-        for (int i = 0; i < userProducts.size(); i++) {
-            UserProduct userProduct = userProducts.get(i);
+        for (UserProduct userProduct : userProducts) {
             FavoriteProduct favoriteProduct = new FavoriteProduct();
             Product product = productRepository.findById(userProduct.getProductId());
             favoriteProduct.setProductId(product.getId());

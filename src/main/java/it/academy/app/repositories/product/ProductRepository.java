@@ -15,7 +15,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Product findByName(String name);
     Product findById(long id);
     List<Product> findAll();
-
     List<Product> findByNameContainingIgnoreCase(String name);
     @Query("SELECT p FROM Product p WHERE lower(p.name) LIKE %:name%")
     List<Product> findByNameLike(@Param("name") String name);

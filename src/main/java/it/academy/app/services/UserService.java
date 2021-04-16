@@ -45,6 +45,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
+    public User findById(long userId) throws IncorrectDataException {
+        return userRepository.findById(userId);
+    }
+
     public User updateUserPassword(String username, String oldPassword, String newPassword) throws IncorrectDataException {
         if (passwordValidator.checkRegex(newPassword)) {
             User user = getUser(username, oldPassword);
