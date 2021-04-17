@@ -18,6 +18,9 @@ public class ProductAibe implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "categoryId")
+    private long categoryId;
+
     public ProductAibe() {
     }
 
@@ -47,5 +50,13 @@ public class ProductAibe implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
     }
 }

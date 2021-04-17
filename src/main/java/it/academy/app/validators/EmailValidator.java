@@ -1,6 +1,7 @@
 package it.academy.app.validators;
 
 import it.academy.app.exception.ValidationException;
+import it.academy.app.shared.ErrorMessages;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;

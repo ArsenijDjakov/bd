@@ -1,4 +1,4 @@
-package it.academy.app.services;
+package it.academy.app.services.product;
 
 import it.academy.app.models.product.Product;
 import org.springframework.data.domain.Page;
@@ -26,7 +26,7 @@ public class ProductPaginationService {
             list = products.subList(startItem, toIndex);
         }
 
-        return new PageImpl<Product>(list, PageRequest.of(currentPage, pageSize), products.size());
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), products.size());
     }
 
 

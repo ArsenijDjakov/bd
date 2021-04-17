@@ -3,6 +3,8 @@ package it.academy.app.validators;
 import it.academy.app.exception.ValidationException;
 import it.academy.app.models.user.User;
 import it.academy.app.repositories.user.UserRepository;
+import it.academy.app.services.UserService;
+import it.academy.app.shared.ErrorMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +20,19 @@ public class UserRegistrationValidator {
     PasswordValidator passwordValidator;
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
-    public boolean checkForm(User user) {
+    public void checkForm(User user) {
         checkUsername(user.getUsername());
         checkPassword(user.getPassword());
         emailValidator.checkEmail(user.getEmail());
-        List<User> users = userRepository.findAll();
+        List<User> users = userService.getAllUsers();
         if (users.stream().anyMatch(su -> su.getUsername().equals(user.getUsername()))) {
             throw new ValidationException(ErrorMessages.usernameAlreadyExist);
         }
         if (users.stream().anyMatch(su -> su.getEmail().equals(user.getEmail()))) {
             throw new ValidationException(ErrorMessages.emailAlreadyExist);
         }
-        return true;
     }
 
     private void checkUsername (String username) {

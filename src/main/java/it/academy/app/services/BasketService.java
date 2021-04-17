@@ -1,15 +1,20 @@
 package it.academy.app.services;
 
+import it.academy.app.exception.IncorrectDataException;
 import it.academy.app.models.BasketProduct;
 import it.academy.app.models.product.Product;
-import it.academy.app.models.user.UserProduct;
+import it.academy.app.models.product.ProductPrice;
+import it.academy.app.models.shop.Shop;
+import it.academy.app.models.user.UserBasket;
 import it.academy.app.repositories.BasketProductRepository;
-import it.academy.app.repositories.product.ProductRepository;
 import it.academy.app.repositories.user.UserBasketRepository;
-import it.academy.app.repositories.user.UserRepository;
+import it.academy.app.services.product.ProductPriceService;
+import it.academy.app.services.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -22,13 +27,13 @@ public class BasketService {
     UserBasketRepository userBasketRepository;
 
     @Autowired
-    UserRepository userRepository;
+    ProductPriceService productPriceService;
 
     @Autowired
-    ProductRepository productRepository;
+    ProductService productService;
 
-    public boolean addProduct(long userId, long productId) {
-        Product product = productRepository.findById(productId);
+    public boolean addProduct(long userId, long productId) throws IncorrectDataException {
+        productService.getProductById(productId);
         long basketId = userBasketRepository.findByUserId(userId).getId();
         List<BasketProduct> basketProducts = basketProductRepository.findByBasketId(basketId);
         if (basketProducts.stream().anyMatch(basketProduct -> basketProduct.getProductId() == productId)) {
@@ -38,8 +43,8 @@ public class BasketService {
         return true;
     }
 
-    public boolean removeProduct(long userId, long productId) {
-        Product product = productRepository.findById(productId);
+    public boolean removeProduct(long userId, long productId) throws IncorrectDataException {
+        productService.getProductById(productId);
         long basketId = userBasketRepository.findByUserId(userId).getId();
         BasketProduct basketProduct = basketProductRepository.findByBasketIdAndProductId(basketId, productId);
         if (basketProduct != null) {
@@ -47,6 +52,42 @@ public class BasketService {
             return true;
         }
         return false;
+    }
+
+    public List<BasketProduct> setupPrettyProductLines(long userId, List<Shop> shops) throws IncorrectDataException {
+        UserBasket basket = userBasketRepository.findByUserId(userId);
+        List<BasketProduct> basketProducts = basketProductRepository.findByBasketId(basket.getId());
+        if (!basketProducts.isEmpty()) {
+            for (BasketProduct basketProduct : basketProducts) {
+                Product product = productService.getProductById(basketProduct.getProductId());
+                HashMap<Long, Double> shopPrices = new HashMap<>();
+                for (Shop shop : shops) {
+                    List<ProductPrice> productPrices = productPriceService.getProductPricesByShopId(basketProduct.getProductId(), shop.getId());
+                    if (!productPrices.isEmpty()) {
+                        ProductPrice lastProductPrice = productPrices.stream().max(Comparator.comparing(ProductPrice::getDate)).get();
+                        shopPrices.put(shop.getId(), lastProductPrice.getPrice());
+                    } else {
+                        shopPrices.put(shop.getId(), 0.0);
+                    }
+                }
+                basketProduct.setProductName(product.getName());
+                basketProduct.setShopPrices(shopPrices);
+            }
+            return basketProducts;
+        }
+        return null;
+    }
+
+    public HashMap<Long, Double> getTotalSums(List<Shop> shops, List<BasketProduct> products) {
+        HashMap<Long, Double> totalSums = new HashMap<>();
+        for (Shop currentShop : shops) {
+            double sum = 0.0;
+            for (BasketProduct product : products) {
+                sum += product.getShopPrices().get(currentShop.getId());
+            }
+            totalSums.put(currentShop.getId(), sum);
+        }
+        return totalSums;
     }
 
 }

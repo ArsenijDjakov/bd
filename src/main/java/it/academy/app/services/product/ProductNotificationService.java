@@ -1,4 +1,4 @@
-package it.academy.app.services;
+package it.academy.app.services.product;
 
 import it.academy.app.models.product.Product;
 import it.academy.app.models.product.ProductNotification;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Properties;
 
 @Service
-public class NotificationService {
+public class ProductNotificationService {
 
     @Autowired
     ProductNotificationRepository productNotificationRepository;
@@ -28,14 +28,18 @@ public class NotificationService {
 
     Properties properties = new Properties();
 
-    public NotificationService() throws IOException {
+    public ProductNotificationService() throws IOException {
         properties.load(new FileReader("src/main/resources/email/config.properties"));
+    }
+
+    public void addNewNotification(ProductNotification productNotification, double price) {
+        productNotification.setLastPrice(price);
+        productNotificationRepository.save(productNotification);
     }
 
     public void sendNotifications(long productId, double price) {
         List<ProductNotification> productMailingList = productNotificationRepository.findByProductId(productId);
-        for (int i = 0; i < productMailingList.size(); i++) {
-            ProductNotification productNotification = productMailingList.get(i);
+        for (ProductNotification productNotification : productMailingList) {
             if (productNotification.getLastPrice() > price) {
                 productNotificationRepository.delete(productNotification);
                 productNotificationRepository.save(new ProductNotification(productId, productNotification.getEmail(), price));
@@ -47,7 +51,6 @@ public class NotificationService {
     }
 
     private void sendProductPriceChangeNotification(String receiverEmail, long productId, String productName, double price) {
-
         final String email = Constants.EMAIL;
         final String password = System.getenv("EMAIL_PASS");
         try {

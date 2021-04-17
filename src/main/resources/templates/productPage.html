@@ -34,11 +34,11 @@
                         </nav>
                         <div class="product_name" th:text="${product.getName()}"></div>
                         <th:block th:if="${minPrice}!=null">
-                            <div class="product_price" th:text="'Mažiausia kaina ' +
+                            <div class="product_price" th:text="#{product.price.lowest} + ' ' +
                              ${#numbers.formatDecimal(minPrice.getPrice(),1,'COMMA',2,'POINT')} + '€'"></div>
                             <hr class="singleline">
                             <div>
-                                <span class="product_info" th:text="'Paskutinį kartą kaina tikrinta '"></span>
+                                <span class="product_info" th:text="#{product.price.last.check} + ' '"></span>
                                 <strong class="product_info" th:text="${minPrice.getDate()}"></strong>
                             </div>
                         </th:block>
@@ -47,22 +47,21 @@
                             <th:block th:each="link: ${links}">
                                 <th:block th:each="shop: ${shops}">
                                     <li th:if="${shop.getId()} == ${link.getShopId()}">
-                                        <text>Pereiti į prekės puslapį</text>
+                                        <text th:text="#{product.page}"></text>
                                         <a th:href="${link.getProductLink()}" target="_blank">
                                             <img class="shop_logo" th:src="'/assets/images/' + ${shop.getLogoLink()}"
                                                  alt="">
                                         </a>
-                                        <text> parduotuvėje</text>
                                     </li>
                                 </th:block>
                             </th:block>
                             <br>
                             <div class="alert" role="alert" id="userSubmissionResult" style="display: none"></div>
                             <button type="button" class="btn btn-success shop-button"
-                                    id="btnFavorites" style="display: none">Pridėti į mėgstamus
+                                    id="btnFavorites" style="display: none" th:text="#{account.favorites.add}">
                             </button>
                             <button type="button" class="btn btn-primary shop-button"
-                                    id="btnBasket" style="display: none">Pridėti į palyginimo krepšelį
+                                    id="btnBasket" style="display: none" th:text="#{account.basket.add}">
                             </button>
                         </div>
                         <hr class="singleline">
@@ -71,11 +70,11 @@
                             <div class="col-xs-6">
                                 <div class="input-group mb-3">
                                     <input id="emailAddress" name="email" type="text"
-                                           class="form-control" placeholder="Jūsų el. paštas"
+                                           class="form-control" th:placeholder="#{product.subscribe.email}"
                                            pattern="">
                                 </div>
-                                <button id="emailSubmission" type="button" class="btn btn-secondary shop-button">
-                                    Pranešti kai kaina sumažės
+                                <button id="emailSubmission" type="button" class="btn btn-secondary shop-button"
+                                        th:text="#{product.subscribe}">
                                 </button>
                             </div>
                         </form>
@@ -88,9 +87,9 @@
             <div class="col-md-6">
                 <th:block th:if="${!productReviews.isEmpty()}">
                     <th:block th:each="review, index : ${productReviews}">
-                        <div class="commented-section mt-2">
+                        <div class="commented-section">
                             <div class="d-flex flex-row align-items-center commented-user">
-                                <h5 class="mr-2" th:text="${review.getUsername()}"></h5>
+                                <h5 class="mr-2" id="reviewUsername" th:text="${review.getUsername()}"></h5>
                                 <span class="mb-1 ml-2" th:text="${review.getDate()}"></span>
                             </div>
                             <div class="comment-text-sm">

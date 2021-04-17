@@ -27,6 +27,11 @@ public class ProductNotification implements Serializable {
                 this.lastPrice = lastPrice;
         }
 
+        public ProductNotification(long productId, String email) {
+                this.productId = productId;
+                this.email = email;
+        }
+
         public ProductNotification() {
         }
 

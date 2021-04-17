@@ -40,6 +40,15 @@ public class Product implements Serializable {
     public Product() {
     }
 
+    public Product(long id) {
+        this.id = id;
+    }
+
+    public Product(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }

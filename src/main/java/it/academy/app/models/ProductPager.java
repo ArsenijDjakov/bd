@@ -1,6 +1,9 @@
 package it.academy.app.models;
 
-public class PagerModel {
+import it.academy.app.models.product.Product;
+import org.springframework.data.domain.Page;
+
+public class ProductPager {
 
     final private int buttonsToShow = 5;
 
@@ -8,7 +11,10 @@ public class PagerModel {
 
     private int endPage;
 
-    public PagerModel(int totalPages, int currentPage) {
+    public ProductPager(Page<Product> productPages) {
+
+        int totalPages = productPages.getTotalPages();
+        int currentPage = productPages.getNumber();
 
         int halfPagesToShow = getButtonsToShow() / 2;
 

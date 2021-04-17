@@ -37,9 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-
         auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
-
     }
 
     @Bean
@@ -65,11 +63,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers( "/category/**")
                 .permitAll()
-                .antMatchers(HttpMethod.GET,"/product/**")
-                .permitAll()
                 .antMatchers(HttpMethod.POST,"/product/search")
                 .permitAll()
-                .antMatchers(HttpMethod.POST,"/product/*/subscribe")
+                .antMatchers(HttpMethod.POST,"/product/subscribe")
+                .permitAll()
+                .antMatchers(HttpMethod.GET,"/product/**")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/webjars/**")
                 .permitAll()

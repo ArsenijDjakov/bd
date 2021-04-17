@@ -6,21 +6,18 @@ import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import it.academy.app.models.product.Product;
-import it.academy.app.models.product.ProductNotification;
-import it.academy.app.models.product.ProductPrice;
 import it.academy.app.models.scraping.*;
+import it.academy.app.models.shop.Shop;
 import it.academy.app.models.shop.ShopProduct;
-import it.academy.app.repositories.product.ProductNotificationRepository;
-import it.academy.app.repositories.product.ProductPriceRepository;
-import it.academy.app.repositories.product.ProductRepository;
 import it.academy.app.repositories.scraping.*;
-import it.academy.app.repositories.shop.ShopProductRepository;
-import it.academy.app.services.NotificationService;
+import it.academy.app.services.ShopService;
+import it.academy.app.services.product.ProductNotificationService;
+import it.academy.app.services.product.ProductPriceService;
+import it.academy.app.services.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,16 +28,13 @@ public class ScrapingService {
     SimilarityService similarityService;
 
     @Autowired
-    NotificationService notificationService;
+    ProductNotificationService productNotificationService;
 
     @Autowired
-    ProductRepository productRepository;
+    ProductPriceService productPriceService;
 
     @Autowired
-    ProductPriceRepository productPriceRepository;
-
-    @Autowired
-    ShopProductRepository shopProductRepository;
+    ShopService shopService;
 
     @Autowired
     AibeRepository aibeRepository;
@@ -65,86 +59,59 @@ public class ScrapingService {
     ArrayList<String> productLinks = new ArrayList<>();
     ArrayList<String> imageLinks = new ArrayList<>();
 
-    public void scrape(long shopId, long categoryId) throws IOException {
-        WebClient webClient;
-
-        webClient = new WebClient(BrowserVersion.CHROME);
-
+    public void scrape(long categoryId) throws IOException {
+        WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
-        List<Product> products = productRepository.findByCategoryId(categoryId);
-        List<Object> shopProducts = new ArrayList<>();
-        switch ((int) shopId) {
-            case 1:
-                barbora(webClient, categoryId);
-                for (Product product : products) {
-                    ProductBarbora p = barboraRepository.findByProductId(product.getId());
-                    if (p != null) {
-                        shopProducts.add(p);
-                    }
-                }
-                break;
-            case 2:
-                rimi(webClient, categoryId);
-                for (Product product : products) {
-                    ProductRimi p = rimiRepository.findByProductId(product.getId());
-                    if (p != null) {
-                        shopProducts.add(p);
-                    }
-                }
-                break;
-            case 3:
-                ciaMarket(webClient, categoryId);
-                for (Product product : products) {
-                    ProductCiaMarket p = ciaMarketRepository.findByProductId(product.getId());
-                    if (p != null) {
-                        shopProducts.add(p);
-                    }
-                }
-                break;
-            case 4:
-                gruste(webClient, categoryId);
-                for (Product product : products) {
-                    ProductGruste p = grusteRepository.findByProductId(product.getId());
-                    if (p != null) {
-                        shopProducts.add(p);
-                    }
-                }
-                break;
-            case 5:
-                aibe(webClient, categoryId);
-                for (Product product : products) {
-                    ProductAibe p = aibeRepository.findByProductId(product.getId());
-                    if (p != null) {
-                        shopProducts.add(p);
-                    }
-                }
-                break;
-            case 6:
-                utenosPrekyba(webClient, categoryId);
-                for (Product product : products) {
-                    ProductUtenosPrekyba p = utenosPrekybaRepository.findByProductId(product.getId());
-                    if (p != null) {
-                        shopProducts.add(p);
-                    }
-                }
-                break;
+        for (Shop shop : shopService.getAllShops()) {
+            long shopId = shop.getId();
+            List<Object> shopProducts = new ArrayList<>();
+            switch ((int) shopId) {
+                case 1:
+                    barbora(webClient, categoryId);
+                    shopProducts = barboraRepository.findByCategoryId(categoryId);
+                    break;
+                case 2:
+                    rimi(webClient, categoryId);
+                    shopProducts = rimiRepository.findByCategoryId(categoryId);
+                    break;
+                case 3:
+                    ciaMarket(webClient, categoryId);
+                    shopProducts = ciaMarketRepository.findByCategoryId(categoryId);
+                    break;
+                case 4:
+                    gruste(webClient, categoryId);
+                    shopProducts = grusteRepository.findByCategoryId(categoryId);
+                    break;
+                case 5:
+                    aibe(webClient, categoryId);
+                    shopProducts = aibeRepository.findByCategoryId(categoryId);
+                    break;
+                case 6:
+                    utenosPrekyba(webClient, categoryId);
+                    shopProducts = utenosPrekybaRepository.findByCategoryId(categoryId);
+                    break;
+            }
+            saveScrapedPrices(shopId, shopProducts);
+            allTitles = new ArrayList<>();
+            allPrices = new ArrayList<>();
+            productLinks = new ArrayList<>();
+            imageLinks = new ArrayList<>();
         }
+    }
+
+    private void saveScrapedPrices(long shopId, List<Object> shopProducts) {
         for (Object product : shopProducts) {
             ProductScratch productScratch = similarityService.getMaxSimilarityScratch(product, shopId, allTitles);
             if (productScratch.getProductId() != 0) {
                 long productId = productScratch.getProductId();
                 double price = Double.parseDouble(allPrices.get(productScratch.getReceivedProductIndex()));
-                productPriceRepository.saveAndFlush(new ProductPrice(productId, shopId,
-                        LocalDate.now().toString(), price));
-                notificationService.sendNotifications(productId, price);
+                productPriceService.addNewProductPrice(productId, shopId, price);
+                productNotificationService.sendNotifications(productId, price);
             }
+            //only for new products
 //            addProductLink(shopId, productScratch);
         }
-        allTitles = new ArrayList<>();
-        allPrices = new ArrayList<>();
-        productLinks = new ArrayList<>();
-        imageLinks = new ArrayList<>();
     }
 
     private void gruste(WebClient webClient, long categoryId) throws IOException {
@@ -173,6 +140,7 @@ public class ScrapingService {
                 }
                 allPrices.add(price);
                 productLinks.add(category);
+                //only for new products
 //                grusteRepository.save(new ProductNameGruste(titles.get(j).asText()));
             }
             i++;
@@ -211,6 +179,7 @@ public class ScrapingService {
             price = price.replace(",", ".");
             allPrices.add(price);
             productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
+            //only for new products
 //            ciaMarketRepository.save(new ProductNameCiaMarket(titles.get(j).asText()));
         }
     }
@@ -246,6 +215,7 @@ public class ScrapingService {
             price = price.replace(",", ".");
             allPrices.add(price);
             productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
+            //only for new products
 //            aibeRepository.save(new ProductAibe(titles.get(j).asText()));
         }
     }
@@ -269,8 +239,9 @@ public class ScrapingService {
             }
             DomNodeList<DomNode> titles = page.querySelectorAll("a.b-product-title span[itemprop='name']");
             DomNodeList<DomNode> prices = page.querySelectorAll(".b-product-price-current-number");
-//            DomNodeList<DomNode> images = page.querySelectorAll("a.b-product--imagelink img");
             DomNodeList<DomNode> links = page.querySelectorAll("a.b-product--imagelink ");
+            //only for new products
+//            DomNodeList<DomNode> images = page.querySelectorAll("a.b-product--imagelink img");
 
             for (int j = 0; j < prices.size(); j++) {
                 allTitles.add(titles.get(j).asText());
@@ -278,8 +249,9 @@ public class ScrapingService {
                 price = price.replace("\u20AC", "");
                 price = price.replace(",", ".");
                 allPrices.add(price);
+                //only for new products
 //                imageLinks.add(images.get(j).getAttributes().getNamedItem("src").getNodeValue());
-//                productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
+                productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
 //                productRepository.save(new Product(titles.get(j).asText(), categoryId, "https://barbora.lt" + images.get(j).getAttributes().getNamedItem("src").getNodeValue()));
             }
             i++;
@@ -314,6 +286,7 @@ public class ScrapingService {
                 price = price.replace(",", ".");
                 allPrices.add(price);
                 productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
+                //only for new products
 //                utenosPrekybaRepository.save(new ProductUtenosPrekyba(titles.get(j).asText()));
             }
             i++;
@@ -346,6 +319,7 @@ public class ScrapingService {
                 String price = pricesF.get(j).asText() + "." + pricesS.get(j).asText();
                 allPrices.add(price);
                 productLinks.add(links.get(j).getAttributes().getNamedItem("href").getNodeValue());
+                //only for new products
 //                rimiRepository.save(new ProductNameRimi(titles.get(j).asText()));
             }
             i++;
@@ -370,6 +344,6 @@ public class ScrapingService {
                 shopProduct.setProductLink(productLinks.get(productScratch.getReceivedProductIndex()));
                 break;
         }
-        shopProductRepository.save(shopProduct);
+        shopService.addNewShopProduct(shopProduct);
     }
 }

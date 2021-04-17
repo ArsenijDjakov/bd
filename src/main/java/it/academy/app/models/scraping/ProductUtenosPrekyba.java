@@ -18,6 +18,9 @@ public class ProductUtenosPrekyba implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "categoryId")
+    private long categoryId;
+
     public ProductUtenosPrekyba() {
     }
 

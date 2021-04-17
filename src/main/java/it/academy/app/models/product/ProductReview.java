@@ -24,12 +24,21 @@ public class ProductReview implements Serializable {
     @Column(name = "userId")
     private long userId;
 
+    @Transient
+    private String username;
+
     public ProductReview() {
     }
 
-    public ProductReview(long userId, long productId) {
+    public ProductReview(long userId, String username) {
         this.userId = userId;
-        this.productId = productId;
+        this.username = username;
+    }
+
+    public ProductReview(String text, String date, String username) {
+        this.text = text;
+        this.date = date;
+        this.username = username;
     }
 
     public long getId() {
@@ -70,5 +79,13 @@ public class ProductReview implements Serializable {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

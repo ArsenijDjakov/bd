@@ -87,10 +87,10 @@ $(function () {
             return;
         }
         $.ajax({
-                url: productId + "/subscribe",
+                url: "/product/subscribe",
                 type: 'POST',
-                data: JSON.stringify({"email": email}),
-                headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
+                contentType: "application/json;charset=UTF-8",
+                data: JSON.stringify({"email": email, "productId": productId}),
                 success: function (data) {
                     if (data.message === "success") {
                         $("#emailAddress").val('');
@@ -130,7 +130,7 @@ $(function () {
         }
         responseDiv.css("display", "none");
         $.ajax({
-                url: "/product/review/add",
+                url: "/product/review",
                 type: 'POST',
                 contentType: "application/json;charset=UTF-8",
                 data: JSON.stringify({"text": review, "productId": productId}),
@@ -139,8 +139,15 @@ $(function () {
                 beforeSend: function () {
                     showSpinner("btnReviewSubmission");
                 },
-                success: function () {
-                    location.reload();
+                success: function (data) {
+                    if (data.message === "success") {
+                        location.reload();
+                    } else {
+                        responseDiv.text(sf);
+                        responseDiv.removeClass("alert-success");
+                        responseDiv.addClass("alert-danger");
+                        responseDiv.css("display", "block");
+                    }
                 },
                 error: function () {
                     hideSpinner("btnReviewSubmission");

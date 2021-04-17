@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ShopRepository extends JpaRepository<Shop, Long> {
-    Shop findByName(String name);
     Shop findById(long id);
     List<Shop> findAll();
 }

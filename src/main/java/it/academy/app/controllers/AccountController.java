@@ -2,25 +2,14 @@ package it.academy.app.controllers;
 
 import it.academy.app.configs.JwtTokenUtil;
 import it.academy.app.exception.IncorrectDataException;
-import it.academy.app.exception.ValidationException;
 import it.academy.app.models.BasketProduct;
-import it.academy.app.models.BasketProductEntity;
-import it.academy.app.models.product.FavoriteProduct;
-import it.academy.app.models.product.Product;
-import it.academy.app.models.product.ProductPrice;
 import it.academy.app.models.shop.Shop;
 import it.academy.app.models.user.User;
-import it.academy.app.models.user.UserBasket;
-import it.academy.app.repositories.BasketProductRepository;
-import it.academy.app.repositories.product.ProductPriceRepository;
-import it.academy.app.repositories.product.ProductRepository;
-import it.academy.app.repositories.shop.ShopRepository;
-import it.academy.app.repositories.user.UserBasketRepository;
-import it.academy.app.repositories.user.UserProductRepository;
-import it.academy.app.repositories.user.UserRepository;
+import it.academy.app.models.user.UserProduct;
 import it.academy.app.services.BasketService;
-import it.academy.app.services.FavoriteProductService;
+import it.academy.app.services.ShopService;
 import it.academy.app.services.UserService;
+import it.academy.app.services.product.UserProductService;
 import it.academy.app.validators.UserRegistrationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -28,7 +17,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,37 +30,19 @@ public class AccountController {
     UserRegistrationValidator userRegistrationValidator;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    ProductPriceRepository productPriceRepository;
-
-    @Autowired
-    UserBasketRepository userBasketRepository;
-
-    @Autowired
-    BasketProductRepository basketProductRepository;
+    JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     UserService userService;
 
     @Autowired
-    JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    UserProductRepository userProductRepository;
-
-    @Autowired
-    ProductRepository productRepository;
-
-    @Autowired
-    FavoriteProductService favoriteProductService;
+    UserProductService userProductService;
 
     @Autowired
     BasketService basketService;
 
     @Autowired
-    ShopRepository shopRepository;
+    ShopService shopService;
 
     @GetMapping("/login")
     public ModelAndView loginView() {
@@ -113,8 +87,8 @@ public class AccountController {
 
     @PostMapping(value = "/account/favorites/{productId}")
     public Map addToFavorites(Authentication authentication, @PathVariable("productId") long productId) throws IncorrectDataException {
-        User user = userService.findByUsername(authentication.getName());
-        if (favoriteProductService.addNewFavorite(user.getId(), productId)) {
+        User user = userService.getByUsername(authentication.getName());
+        if (userProductService.addNewFavorite(user.getId(), productId)) {
             return Map.of("message", "success");
         }
         return Map.of("message", "alreadyInFavorites");
@@ -126,10 +100,10 @@ public class AccountController {
             String username = jwtTokenUtil.getUsernameFromToken(token);
             UserDetails userDetails = userService.loadUserByUsername(username);
             if (jwtTokenUtil.validateToken(token, userDetails)) {
-                ArrayList<FavoriteProduct> favoriteProducts = favoriteProductService.getUserFavoriteProducts(username);
+                List<UserProduct> userProducts = userProductService.getUserFavoriteProducts(username);
                 ModelAndView modelAndView =  new ModelAndView("favoritesListView");
-                if (!favoriteProducts.isEmpty()) {
-                    modelAndView.addObject("userProducts", favoriteProducts);
+                if (!userProducts.isEmpty()) {
+                    modelAndView.addObject("userProducts", userProducts);
                 } else {
                     modelAndView.addObject("userProducts", null);
                 }
@@ -143,8 +117,8 @@ public class AccountController {
 
     @PostMapping(value = "/account/favorites/remove")
     public Map removeFromFavorites(Authentication authentication, long productId) throws IncorrectDataException {
-        User user = userService.findByUsername(authentication.getName());
-        if(favoriteProductService.removeFavorite(user.getId(), productId)) {
+        User user = userService.getByUsername(authentication.getName());
+        if(userProductService.removeFavorite(user.getId(), productId)) {
             return Map.of("message", "success");
         };
         return Map.of("message", "fail");
@@ -152,7 +126,7 @@ public class AccountController {
 
     @PostMapping(value = "/account/basket/{productId}")
     public Map addToBasket(Authentication authentication, @PathVariable("productId") long productId) throws IncorrectDataException {
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.getByUsername(authentication.getName());
         if (basketService.addProduct(user.getId(), productId)) {
             return Map.of("message", "success");
         }
@@ -161,7 +135,7 @@ public class AccountController {
 
     @PostMapping(value = "/account/basket/remove")
     public Map removeFromBasket(Authentication authentication, long productId) throws IncorrectDataException {
-        User user = userService.findByUsername(authentication.getName());
+        User user = userService.getByUsername(authentication.getName());
         if(basketService.removeProduct(user.getId(), productId)) {
             return Map.of("message", "success");
         };
@@ -174,53 +148,21 @@ public class AccountController {
             String username = jwtTokenUtil.getUsernameFromToken(token);
             UserDetails userDetails = userService.loadUserByUsername(username);
             if (jwtTokenUtil.validateToken(token, userDetails)) {
-                User user = userRepository.findByUsername(username);
-                UserBasket basket = userBasketRepository.findByUserId(user.getId());
-                List<Shop> shops = shopRepository.findAll().stream().sorted(Comparator.comparing(Shop::getName)).collect(Collectors.toList());
-                List<BasketProduct> basketProducts = basketProductRepository.findByBasketId(basket.getId());
+                User user = userService.getByUsername(username);
+                List<Shop> shops = shopService.getAllShops().stream().sorted(Comparator.comparing(Shop::getName)).collect(Collectors.toList());
                 ModelAndView modelAndView = new ModelAndView("basketView");
-                if (!basketProducts.isEmpty()) {
-                    ArrayList<BasketProductEntity> productEntities = new ArrayList<>();
-                    for (BasketProduct basketProduct : basketProducts) {
-                        Product product = productRepository.findById(basketProduct.getProductId());
-                        HashMap<Long, Double> shopPrices = new HashMap<>();
-                        for (Shop shop : shops) {
-                            List<ProductPrice> productPrices = productPriceRepository
-                                    .findByShopIdAndProductId(shop.getId(), basketProduct.getProductId());
-                            if (!productPrices.isEmpty()) {
-                                ProductPrice lastProductPrice = productPrices.stream().max(Comparator.comparing(ProductPrice::getDate)).get();
-                                shopPrices.put(shop.getId(), lastProductPrice.getPrice());
-                            } else {
-                                shopPrices.put(shop.getId(), 0.0);
-                            }
-                        }
-                        productEntities.add(new BasketProductEntity(basketProduct.getProductId(), product.getName(),
-                                shopPrices));
-                    }
-                    HashMap<Long, Double> totalSums = new HashMap<>();
-                    for (Shop currentShop : shops) {
-                        double sum = 0.0;
-                        for (BasketProductEntity productEntity : productEntities) {
-                            sum += productEntity.getShopPrices().get(currentShop.getId());
-                        }
-                        totalSums.put(currentShop.getId(), sum);
-                    }
-                    modelAndView.addObject("productEntities", productEntities)
-                    .addObject("totalSums", totalSums);
-                } else {
-                    modelAndView.addObject("productEntities", null);
+                List<BasketProduct> basketProducts = basketService.setupPrettyProductLines(user.getId(), shops);
+                if (basketProducts!=null) {
+                    HashMap<Long, Double> totalSums = basketService.getTotalSums(shops, basketProducts);
+                    modelAndView.addObject("totalSums", totalSums);
                 }
-                return  modelAndView.addObject("shops", shops);
+                return modelAndView.addObject("shops", shops)
+                        .addObject("productEntities", basketProducts);
             }
             return new ModelAndView("loginView");
         } catch (Exception e) {
             return new ModelAndView("loginView");
         }
-    }
-
-    @ExceptionHandler
-    public ModelAndView handleException() {
-        return new ModelAndView("error");
     }
 
 }

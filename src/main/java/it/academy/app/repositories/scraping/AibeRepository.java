@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface AibeRepository extends JpaRepository<ProductAibe, Long> {
     List<ProductAibe> findAll();
+    List<Object> findByCategoryId(long categoryId);
     ProductAibe findByProductId(long productId);
 }

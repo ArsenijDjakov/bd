@@ -6,9 +6,8 @@ import it.academy.app.models.user.User;
 import it.academy.app.models.user.UserBasket;
 import it.academy.app.repositories.user.UserBasketRepository;
 import it.academy.app.repositories.user.UserRepository;
-import it.academy.app.validators.ErrorMessages;
+import it.academy.app.shared.ErrorMessages;
 import it.academy.app.validators.PasswordValidator;
-import org.apache.bcel.verifier.statics.Pass1Verifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -30,9 +30,21 @@ public class UserService implements UserDetailsService {
     @Autowired
     UserBasketRepository userBasketRepository;
 
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getByUsername(String username) throws IncorrectDataException {
+        return userRepository.findByUsername(username);
+    }
+
+    public User findById(long userId) throws IncorrectDataException {
+        return userRepository.findById(userId);
+    }
+
     public User getUser(String username, String password) throws IncorrectDataException {
-        User candidate = findByUsername(username);
-        if (candidate ==null) {
+        User candidate = getByUsername(username);
+        if (candidate == null) {
             throw new IncorrectDataException("No such user exist");
         }
         if (!BCrypt.checkpw(password, candidate.getPassword())) {
@@ -41,24 +53,16 @@ public class UserService implements UserDetailsService {
         return candidate;
     }
 
-    public User findByUsername(String username) throws IncorrectDataException {
-        return userRepository.findByUsername(username);
-    }
-
-    public User findById(long userId) throws IncorrectDataException {
-        return userRepository.findById(userId);
-    }
-
-    public User updateUserPassword(String username, String oldPassword, String newPassword) throws IncorrectDataException {
+    public void updateUserPassword(String username, String oldPassword, String newPassword) throws IncorrectDataException {
         if (passwordValidator.checkRegex(newPassword)) {
             User user = getUser(username, oldPassword);
             userRepository.delete(user);
             String hashedPass = BCrypt.hashpw(newPassword, BCrypt.gensalt(15));
             user.setPassword(hashedPass);
             userRepository.save(user);
-            return userRepository.findByUsername(username);
+        } else {
+            throw new ValidationException(ErrorMessages.invalidPasswordFormat);
         }
-        throw new ValidationException(ErrorMessages.invalidPasswordFormat);
     }
 
     public void addNewUser(User user) {
@@ -72,7 +76,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         User user;
         try {
-            user = findByUsername(username);
+            user = getByUsername(username);
         } catch (IncorrectDataException e) {
             throw new UsernameNotFoundException("Username not found");
         }

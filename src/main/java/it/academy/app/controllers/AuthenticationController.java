@@ -1,11 +1,10 @@
 package it.academy.app.controllers;
 
-import it.academy.app.configs.UserAuthenticationProvider;
 import it.academy.app.configs.JwtTokenUtil;
+import it.academy.app.configs.UserAuthenticationProvider;
 import it.academy.app.models.jwt.JwtRequest;
 import it.academy.app.models.jwt.JwtResponse;
 import it.academy.app.models.user.User;
-import it.academy.app.repositories.user.UserRepository;
 import it.academy.app.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.Map;
 
@@ -31,9 +29,6 @@ public class AuthenticationController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    UserRepository userRepository;
-
     @PostMapping
     @RequestMapping(value = "/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
@@ -43,7 +38,7 @@ public class AuthenticationController {
         final UserDetails userDetails = userService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
-        final User user = userRepository.findByUsername(userDetails.getUsername());
+        final User user = userService.getByUsername(userDetails.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
         Date exp = jwtTokenUtil.getExpirationDateFromToken(token);

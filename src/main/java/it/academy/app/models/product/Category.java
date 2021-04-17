@@ -18,12 +18,6 @@ public class Category implements Serializable {
     @Column(name = "imageLink")
     private String imageLink;
 
-    public Category(long id, String name, String imageLink) {
-        this.id = id;
-        this.name = name;
-        this.imageLink = imageLink;
-    }
-
     public Category() {
     }
 

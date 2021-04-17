@@ -23,6 +23,11 @@ public class Shop implements Serializable {
         this.name = name;
     }
 
+    public Shop(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Shop() {
     }
 

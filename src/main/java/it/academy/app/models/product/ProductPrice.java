@@ -24,8 +24,10 @@ public class ProductPrice implements Serializable {
     @Column(name = "price")
     private double price;
 
+    @Transient
     private String shopName;
 
+    @Transient
     private String shopLogoLink;
 
     public ProductPrice() {
@@ -93,16 +95,5 @@ public class ProductPrice implements Serializable {
     public void setShopLogoLink(String shopLogoLink) {
         this.shopLogoLink = shopLogoLink;
     }
-
-    @Override
-    public String toString() {
-        return "{id:" + id +
-                ", productId:" + productId +
-                ", shopId:" + shopId +
-                ", date:" + date +
-                ", price:" + price +
-                '}';
-    }
-
 
 }

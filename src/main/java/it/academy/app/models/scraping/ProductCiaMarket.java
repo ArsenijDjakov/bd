@@ -15,6 +15,9 @@ public class ProductCiaMarket implements Serializable {
     @Column(name = "productId")
     private long productId;
 
+    @Column(name = "categoryId")
+    private long categoryId;
+
     @Column(name = "name")
     private String name;
 

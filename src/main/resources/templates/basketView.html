@@ -80,9 +80,7 @@
             </tbody>
         </table>
     </div>
-    <div class="table-responsive" th:unless="${productEntities} !=null">
-        Basket is empty
-    </div>
+    <div class="table-responsive" th:unless="${productEntities} !=null" th:text="#{account.basket.empty}"></div>
 </div>
 </body>
 <script th:inline="javascript">

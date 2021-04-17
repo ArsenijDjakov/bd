@@ -54,9 +54,7 @@
             </tbody>
         </table>
     </div>
-    <div class="table-responsive" th:unless="${userProducts} !=null">
-        You have not added favorite products
-    </div>
+    <div class="table-responsive" th:unless="${userProducts} !=null" th:text="#{account.favorites.empty}"></div>
 </div>
 </body>
 <script th:inline="javascript">

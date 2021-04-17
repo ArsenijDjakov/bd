@@ -12,11 +12,8 @@ public class UserBasket implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-
     @Column(name = "userId")
     private long userId;
-
-
 
     public UserBasket() {
     }

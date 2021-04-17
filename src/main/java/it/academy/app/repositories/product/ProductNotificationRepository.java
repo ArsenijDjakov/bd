@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface ProductNotificationRepository extends JpaRepository<ProductNotification, Long> {
     List<ProductNotification> findByProductId(long productId);
-    List<ProductNotification> findByEmail(String email);
     List<ProductNotification> findByProductIdAndEmail(long productId, String email);
     List<ProductNotification> findAll();
 }

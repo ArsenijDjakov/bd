@@ -18,6 +18,9 @@ public class ProductBarbora implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "categoryId")
+    private long categoryId;
+
     @Column(name = "image_link")
     private String imageLink;
 
