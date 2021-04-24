@@ -59,6 +59,11 @@ public class ProductController {
                 .addObject("products", products);
     }
 
+    @GetMapping("/faq")
+    public ModelAndView faqView() {
+        return new ModelAndView("faq");
+    }
+
     @GetMapping(value = "/product/{productId}")
     public ModelAndView getProductById(@PathVariable("productId") long productId) throws IncorrectDataException {
         Product product = productService.getProductById(productId);

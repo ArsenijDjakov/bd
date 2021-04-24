@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="lt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="#{faq}"></title>
+    <th:block th:insert="fragments/head :: head"></th:block>
+    <link th:rel="stylesheet" th:href="@{/assets/styles/faq.css}"/>
+</head>
+<body>
+<nav th:insert="fragments/navigation :: navigation"></nav>
+<section class="accordion-section clearfix mt-3">
+    <h2 class="text-center mt-5 mb-5" th:text="#{faq.title}"></h2>
+    <div class="container mt-50 mb-50">
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading p-3 mb-3" role="tab" id="heading0">
+                    <h3 class="panel-title">
+                        <a class="collapsed" role="button" title="" data-toggle="collapse" data-parent="#accordion"
+                           href="#collapse0" aria-expanded="true" aria-controls="collapse0" th:text="#{faq.1}">
+                        </a>
+                    </h3>
+                </div>
+                <div id="collapse0" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading0">
+                    <div class="panel-body px-3 mb-4">
+                        <p th:text="#{faq.1.answer}"></p>
+<!--                        <ul>-->
+<!--                            <li>Light speed deployment on the most secure and stable cloud infrastructure available on-->
+<!--                                the market.-->
+<!--                            </li>-->
+<!--                            <li>Scalability – pay for what you need today and add-on options as you grow.</li>-->
+<!--                            <li>All of the bells and whistles of other enterprise CMS options but without the design-->
+<!--                                limitations - this CMS simply lets you realize your creative visions.-->
+<!--                            </li>-->
+<!--                            <li>Amazing support backed by a team of Solodev pros – here when you need them.</li>-->
+<!--                        </ul>-->
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading p-3 mb-3" role="tab" id="heading1">
+                    <h3 class="panel-title">
+                        <a class="collapsed" role="button" title="" data-toggle="collapse" data-parent="#accordion"
+                           href="#collapse1" aria-expanded="true" aria-controls="collapse1" th:text="#{faq.2}">
+                        </a>
+                    </h3>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading1">
+                    <div class="panel-body px-3 mb-4">
+                        <p th:text="#{faq.2.answer}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading p-3 mb-3" role="tab" id="heading3">
+                    <h3 class="panel-title">
+                        <a class="collapsed" role="button" title="" data-toggle="collapse" data-parent="#accordion"
+                           href="#collapse3" aria-expanded="true" aria-controls="collapse3" th:text="#{faq.3}">
+                        </a>
+                    </h3>
+                </div>
+                <div id="collapse3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading3">
+                    <div class="panel-body px-3 mb-4">
+                        <p th:text="#{faq.3.answer}"></p>
+                    </div>
+                </div>
+            </div>
+          <div class="panel panel-default">
+            <div class="panel-heading p-3 mb-3" role="tab" id="heading2">
+              <h3 class="panel-title">
+                <a class="collapsed" role="button" title="" data-toggle="collapse" data-parent="#accordion"
+                   href="#collapse2" aria-expanded="true" aria-controls="collapse2" th:text="#{faq.4}">
+                </a>
+              </h3>
+            </div>
+            <div id="collapse2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading2">
+              <div class="panel-body px-3 mb-4">
+                <p th:text="#{faq.4.answer}"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

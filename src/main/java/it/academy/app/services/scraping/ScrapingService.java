@@ -195,8 +195,10 @@ public class ScrapingService {
                 aibeScrape(page);
                 break;
             case 3:
+                webClient.getPage("https://www.aibesmaistas.lt/1237-gazuotas-mineralinis-vanduo");
                 page = webClient.getPage("https://www.aibesmaistas.lt/1237-gazuotas-mineralinis-vanduo");
                 aibeScrape(page);
+                webClient.getPage("https://www.aibesmaistas.lt/1238-negazuotas-naturalus-mineralinis-vanduo");
                 page = webClient.getPage("https://www.aibesmaistas.lt/1238-negazuotas-naturalus-mineralinis-vanduo");
                 aibeScrape(page);
                 break;
