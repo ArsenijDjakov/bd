@@ -9,4 +9,5 @@ public interface ProductPriceRepository extends JpaRepository<ProductPrice, Long
     List<ProductPrice> findByProductId(long productId);
     List<ProductPrice> findByShopIdAndProductId(long shopId, long productId);
     List<ProductPrice> findAll();
+    List<ProductPrice> findAllByDate(String date);
 }

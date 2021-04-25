@@ -5,20 +5,19 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import it.academy.app.models.product.Product;
-import it.academy.app.models.scraping.*;
+import it.academy.app.models.scraping.ProductScratch;
 import it.academy.app.models.shop.Shop;
 import it.academy.app.models.shop.ShopProduct;
 import it.academy.app.repositories.scraping.*;
 import it.academy.app.services.ShopService;
 import it.academy.app.services.product.ProductNotificationService;
 import it.academy.app.services.product.ProductPriceService;
-import it.academy.app.services.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -60,43 +59,47 @@ public class ScrapingService {
     ArrayList<String> imageLinks = new ArrayList<>();
 
     public void scrape(long categoryId) throws IOException {
-        WebClient webClient = new WebClient(BrowserVersion.CHROME);
-        webClient.getOptions().setCssEnabled(false);
-        webClient.getOptions().setJavaScriptEnabled(false);
-        for (Shop shop : shopService.getAllShops()) {
-            long shopId = shop.getId();
-            List<Object> shopProducts = new ArrayList<>();
-            switch ((int) shopId) {
-                case 1:
-                    barbora(webClient, categoryId);
-                    shopProducts = barboraRepository.findByCategoryId(categoryId);
-                    break;
-                case 2:
-                    rimi(webClient, categoryId);
-                    shopProducts = rimiRepository.findByCategoryId(categoryId);
-                    break;
-                case 3:
-                    ciaMarket(webClient, categoryId);
-                    shopProducts = ciaMarketRepository.findByCategoryId(categoryId);
-                    break;
-                case 4:
-                    gruste(webClient, categoryId);
-                    shopProducts = grusteRepository.findByCategoryId(categoryId);
-                    break;
-                case 5:
-                    aibe(webClient, categoryId);
-                    shopProducts = aibeRepository.findByCategoryId(categoryId);
-                    break;
-                case 6:
-                    utenosPrekyba(webClient, categoryId);
-                    shopProducts = utenosPrekybaRepository.findByCategoryId(categoryId);
-                    break;
+        if (productPriceService.checkIsScrapingNeeded()) {
+            WebClient webClient = new WebClient(BrowserVersion.CHROME);
+            webClient.getOptions().setCssEnabled(false);
+            webClient.getOptions().setJavaScriptEnabled(false);
+            for (Shop shop : shopService.getAllShops()) {
+                long shopId = shop.getId();
+                List<Object> shopProducts = new ArrayList<>();
+                switch ((int) shopId) {
+                    case 1:
+                        barbora(webClient, categoryId);
+                        shopProducts = barboraRepository.findByCategoryId(categoryId);
+                        break;
+                    case 2:
+                        rimi(webClient, categoryId);
+                        shopProducts = rimiRepository.findByCategoryId(categoryId);
+                        break;
+                    case 3:
+                        ciaMarket(webClient, categoryId);
+                        shopProducts = ciaMarketRepository.findByCategoryId(categoryId);
+                        break;
+                    case 4:
+                        gruste(webClient, categoryId);
+                        shopProducts = grusteRepository.findByCategoryId(categoryId);
+                        break;
+                    case 5:
+                        aibe(webClient, categoryId);
+                        shopProducts = aibeRepository.findByCategoryId(categoryId);
+                        break;
+                    case 6:
+                        utenosPrekyba(webClient, categoryId);
+                        shopProducts = utenosPrekybaRepository.findByCategoryId(categoryId);
+                        break;
+                }
+                saveScrapedPrices(shopId, shopProducts);
+                allTitles = new ArrayList<>();
+                allPrices = new ArrayList<>();
+                productLinks = new ArrayList<>();
+                imageLinks = new ArrayList<>();
             }
-            saveScrapedPrices(shopId, shopProducts);
-            allTitles = new ArrayList<>();
-            allPrices = new ArrayList<>();
-            productLinks = new ArrayList<>();
-            imageLinks = new ArrayList<>();
+        } else {
+            System.out.println("Scraping is not needed... " + new Date());
         }
     }
 

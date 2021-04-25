@@ -46,4 +46,9 @@ public class ProductPriceService {
                 LocalDate.now().toString(), price));
     }
 
+    public boolean checkIsScrapingNeeded() {
+        List<ProductPrice> todayProductPrices = productPriceRepository.findAllByDate(LocalDate.now().toString());
+        return todayProductPrices.isEmpty();
+    }
+
 }
