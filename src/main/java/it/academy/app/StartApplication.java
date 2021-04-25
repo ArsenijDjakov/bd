@@ -28,7 +28,7 @@ public class StartApplication {
                     e.printStackTrace();
                 }
             }
-        },date, 10000);
+        },date, 24*60*60*1000);
     }
 }
 
