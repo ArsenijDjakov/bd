@@ -67,7 +67,9 @@ public class UserProductService {
                 Shop shop = shopService.getShopById(minPrice.getShopId());
                 userProduct.setShopLogoLink(shop.getLogoLink());
                 ShopProduct shopProduct = shopService.getByShopIdAndProductId(shop.getId(), product.getId());
-                userProduct.setShopLink(shopProduct.getProductLink());
+                if (shopProduct!=null) {
+                    userProduct.setShopLink(shopProduct.getProductLink());
+                }
             }
         }
         return userProducts;
