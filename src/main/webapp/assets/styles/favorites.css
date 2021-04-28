@@ -32,8 +32,16 @@ table.table td a.link {
     color: #a0a5b1;
 }
 
-table.table td a.view {
+table.table td a.basket {
     color: #03A9F4;
+}
+
+table.table td a.favorite {
+    color: #28a745;
+}
+
+table.table td a.delete {
+    color: #dc3545;
 }
 
 table.table td i {

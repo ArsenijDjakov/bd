@@ -31,7 +31,7 @@
         <div class="col-sm-12 mt-4">
             <form th:action="@{/product}" method="GET">
                 <div class="input-group">
-                    <input type="search" name="search" id="search" th:placeholder="#{search}" class="form-control"/>
+                    <input type="search" name="search" id="search" th:placeholder="#{search.placeholder}" class="form-control"/>
                     <button type="submit" id="btnSearch" class="btn btn-primary">
                         <i class="fas fa-search"></i>
                         <text th:text="#{search}"></text>
@@ -69,8 +69,6 @@
 <th:block th:if="${!productPages.isEmpty()}">
     <nav th:insert="fragments/pagination :: pagination"></nav>
 </th:block>
-<div class="text-center mt-4" th:unless="${!productPages.isEmpty()}">
-    No products provided
-</div>
+<div class="text-center mt-4" th:unless="${!productPages.isEmpty()}" th:text="#{products.empty}"></div>
 </body>
 </html>

@@ -9,69 +9,11 @@ $(function () {
         $('#reviewBlock').hide();
     }
     $("#btnFavorites").click(function () {
-        var responseDiv = $("#userSubmissionResult");
-        responseDiv.css("display", "none");
-        $.ajax({
-                url: "/account/favorites/" + productId,
-                type: 'POST',
-                headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
-                success: function (data) {
-                    if (data.message === "success") {
-                        responseDiv.text(pss);
-                        responseDiv.removeClass("alert-danger");
-                        responseDiv.addClass("alert-success");
-                    } else if (data.message === "alreadyInFavorites") {
-                        responseDiv.text(aif);
-                        responseDiv.removeClass("alert-success");
-                        responseDiv.addClass("alert-danger");
-                    } else {
-                        responseDiv.text(sf);
-                        responseDiv.removeClass("alert-success");
-                        responseDiv.addClass("alert-danger");
-                    }
-                    responseDiv.css("display", "block");
-                },
-                error: function () {
-                    responseDiv.text(sf);
-                    responseDiv.removeClass("alert-success");
-                    responseDiv.addClass("alert-danger");
-                    responseDiv.css("display", "block");
-                }
-            }
-        );
+        addToFavoritesAjax(productId);
     });
 
     $("#btnBasket").click(function () {
-        var responseDiv = $("#userSubmissionResult");
-        responseDiv.css("display", "none");
-        $.ajax({
-                url: "/account/basket/" + productId,
-                type: 'POST',
-                headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
-                success: function (data) {
-                    if (data.message === "success") {
-                        responseDiv.text(pss);
-                        responseDiv.removeClass("alert-danger");
-                        responseDiv.addClass("alert-success");
-                    } else if (data.message === "alreadyInBasket") {
-                        responseDiv.text(aib);
-                        responseDiv.removeClass("alert-success");
-                        responseDiv.addClass("alert-danger");
-                    } else {
-                        responseDiv.text(sf);
-                        responseDiv.removeClass("alert-success");
-                        responseDiv.addClass("alert-danger");
-                    }
-                    responseDiv.css("display", "block");
-                },
-                error: function () {
-                    responseDiv.text(sf);
-                    responseDiv.removeClass("alert-success");
-                    responseDiv.addClass("alert-danger");
-                    responseDiv.css("display", "block");
-                }
-            }
-        );
+
     });
 
     $("#emailSubmission").click(function () {
@@ -160,3 +102,70 @@ $(function () {
         );
     });
 });
+
+function addToBasketAjax(productId) {
+    var responseDiv = $("#userSubmissionResult");
+    responseDiv.css("display", "none");
+    $.ajax({
+            url: "/account/basket/" + productId,
+            type: 'POST',
+            headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
+            success: function (data) {
+                if (data.message === "success") {
+                    responseDiv.text(pss);
+                    responseDiv.removeClass("alert-danger");
+                    responseDiv.addClass("alert-success");
+                } else if (data.message === "alreadyInBasket") {
+                    responseDiv.text(aib);
+                    responseDiv.removeClass("alert-success");
+                    responseDiv.addClass("alert-danger");
+                } else {
+                    responseDiv.text(sf);
+                    responseDiv.removeClass("alert-success");
+                    responseDiv.addClass("alert-danger");
+                }
+                responseDiv.css("display", "block");
+            },
+            error: function () {
+                responseDiv.text(sf);
+                responseDiv.removeClass("alert-success");
+                responseDiv.addClass("alert-danger");
+                responseDiv.css("display", "block");
+            }
+        }
+    );
+}
+
+function addToFavoritesAjax(productId) {
+    var responseDiv = $("#userSubmissionResult");
+    responseDiv.css("display", "none");
+    $.ajax({
+            url: "/account/favorites/" + productId,
+            type: 'POST',
+            headers: {"Authorization": 'Bearer ' + sessionStorage.getItem('token')},
+            success: function (data) {
+                if (data.message === "success") {
+                    responseDiv.text(pss);
+                    responseDiv.removeClass("alert-danger");
+                    responseDiv.addClass("alert-success");
+                } else if (data.message === "alreadyInFavorites") {
+                    responseDiv.text(aif);
+                    responseDiv.removeClass("alert-success");
+                    responseDiv.addClass("alert-danger");
+                } else {
+                    responseDiv.text(sf);
+                    responseDiv.removeClass("alert-success");
+                    responseDiv.addClass("alert-danger");
+                }
+                responseDiv.css("display", "block");
+            },
+            error: function () {
+                responseDiv.text(sf);
+                responseDiv.removeClass("alert-success");
+                responseDiv.addClass("alert-danger");
+                responseDiv.css("display", "block");
+            }
+        }
+    );
+}
+
