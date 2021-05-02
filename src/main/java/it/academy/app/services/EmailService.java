@@ -2,8 +2,11 @@ package it.academy.app.services;
 
 import it.academy.app.models.product.Product;
 import it.academy.app.models.product.ProductNotification;
+import it.academy.app.models.product.ProductPrice;
 import it.academy.app.repositories.product.ProductNotificationRepository;
+import it.academy.app.repositories.product.ProductPriceRepository;
 import it.academy.app.repositories.product.ProductRepository;
+import it.academy.app.services.product.ProductPriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +26,16 @@ public class EmailService {
     final String password = System.getenv("EMAIL_PASS");
 
     @Autowired
+    ProductPriceService productPriceService;
+
+    @Autowired
     ProductNotificationRepository productNotificationRepository;
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    ProductPriceRepository productPriceRepository;
 
     Properties properties = new Properties();
 
@@ -39,15 +48,18 @@ public class EmailService {
         productNotificationRepository.save(productNotification);
     }
 
-    public void sendNotifications(long productId, double price) {
-        List<ProductNotification> productMailingList = productNotificationRepository.findByProductId(productId);
+    public void sendPriceChangeNotifications() {
+        List<ProductNotification> productMailingList = productNotificationRepository.findAll();
         for (ProductNotification productNotification : productMailingList) {
-            if (productNotification.getLastPrice() > price) {
+            long productId = productNotification.getProductId();
+            List<ProductPrice> prices = productPriceRepository.findByProductId(productId);
+            ProductPrice lastMinPrice = productPriceService.getLastMinPrice(prices);
+            if (productNotification.getLastPrice() != lastMinPrice.getPrice()) {
                 productNotificationRepository.delete(productNotification);
-                productNotificationRepository.save(new ProductNotification(productId, productNotification.getEmail(), price));
+                productNotificationRepository.save(new ProductNotification(productId, productNotification.getEmail(), lastMinPrice.getPrice()));
                 Product notificationProduct = productRepository.findById(productId);
                 String emailText = String.format(properties.getProperty("notification.message"), notificationProduct.getName(),
-                        price, productId);
+                        lastMinPrice.getPrice(), productId);
                 sendEmail(productNotification.getEmail(), properties.getProperty("notification.message.subject"), emailText);
             }
         }

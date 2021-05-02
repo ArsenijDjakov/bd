@@ -98,6 +98,7 @@ public class ScrapingService {
                 productLinks = new ArrayList<>();
                 imageLinks = new ArrayList<>();
             }
+            emailService.sendPriceChangeNotifications();
         } else {
             System.out.println("Scraping is not needed... " + new Date());
         }
@@ -110,7 +111,6 @@ public class ScrapingService {
                 long productId = productScratch.getProductId();
                 double price = Double.parseDouble(allPrices.get(productScratch.getReceivedProductIndex()));
                 productPriceService.addNewProductPrice(productId, shopId, price);
-                emailService.sendNotifications(productId, price);
             }
             //only for new products
 //            addProductLink(shopId, productScratch);
