@@ -27,7 +27,7 @@ public class ProductController {
     ProductReviewService productReviewService;
 
     @Autowired
-    ProductNotificationService productNotificationService;
+    EmailService emailService;
 
     @Autowired
     ProductService productService;
@@ -86,7 +86,7 @@ public class ProductController {
             long productId = productNotification.getProductId();
             List<ProductPrice> productPrices = productPriceService.getProductPrices(productId);
             if (subscriptionValidator.checkNewSubscription(productNotification)) {
-                productNotificationService.addNewNotification(productNotification, productPriceService.getLastMinPrice(productPrices).getPrice());
+                emailService.addNewNotification(productNotification, productPriceService.getLastMinPrice(productPrices).getPrice());
                 return Map.of("message", "success");
             }
             return Map.of("message", "alreadySub");

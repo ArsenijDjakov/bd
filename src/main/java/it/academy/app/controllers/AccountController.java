@@ -7,6 +7,7 @@ import it.academy.app.models.shop.Shop;
 import it.academy.app.models.user.User;
 import it.academy.app.models.user.UserProduct;
 import it.academy.app.services.BasketService;
+import it.academy.app.services.EmailService;
 import it.academy.app.services.ShopService;
 import it.academy.app.services.UserService;
 import it.academy.app.services.product.UserProductService;
@@ -44,6 +45,9 @@ public class AccountController {
     @Autowired
     ShopService shopService;
 
+    @Autowired
+    EmailService emailService;
+
     @GetMapping("/login")
     public ModelAndView loginView() {
         return new ModelAndView("loginView");
@@ -59,6 +63,7 @@ public class AccountController {
     public Map addNewUser(@RequestBody User user) {
         userRegistrationValidator.checkForm(user);
         userService.addNewUser(user);
+        emailService.sendRegistrationConfirmation(user.getEmail(), user.getUsername(), user.getPassword());
         return Map.of("message", "success");
     }
 

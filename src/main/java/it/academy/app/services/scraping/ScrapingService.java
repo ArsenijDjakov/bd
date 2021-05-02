@@ -10,7 +10,7 @@ import it.academy.app.models.shop.Shop;
 import it.academy.app.models.shop.ShopProduct;
 import it.academy.app.repositories.scraping.*;
 import it.academy.app.services.ShopService;
-import it.academy.app.services.product.ProductNotificationService;
+import it.academy.app.services.EmailService;
 import it.academy.app.services.product.ProductPriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class ScrapingService {
     SimilarityService similarityService;
 
     @Autowired
-    ProductNotificationService productNotificationService;
+    EmailService emailService;
 
     @Autowired
     ProductPriceService productPriceService;
@@ -110,7 +110,7 @@ public class ScrapingService {
                 long productId = productScratch.getProductId();
                 double price = Double.parseDouble(allPrices.get(productScratch.getReceivedProductIndex()));
                 productPriceService.addNewProductPrice(productId, shopId, price);
-                productNotificationService.sendNotifications(productId, price);
+                emailService.sendNotifications(productId, price);
             }
             //only for new products
 //            addProductLink(shopId, productScratch);
