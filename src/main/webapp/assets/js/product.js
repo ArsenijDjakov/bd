@@ -13,7 +13,7 @@ $(function () {
     });
 
     $("#btnBasket").click(function () {
-
+        addToBasketAjax(productId);
     });
 
     $("#emailSubmission").click(function () {
