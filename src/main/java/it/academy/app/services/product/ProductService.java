@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +39,7 @@ public class ProductService {
 
     public List<Product> searchByName(String search) {
         search = search.replaceAll("[aAąĄcCčČeEęĘėĖiIįĮsSšŠuUųŲūŪzZžŽ]", "_");
-        return productRepository.findByNameLike(search);
+        return productRepository.findByNameLike(search.toLowerCase());
     }
 
 }
